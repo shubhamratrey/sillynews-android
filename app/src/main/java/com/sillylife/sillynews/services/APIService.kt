@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 object APIService {
 
-    const val BASE_URL = "http://192.168.0.104:8000/"
+    const val BASE_URL = "http://shubhamratrey.pythonanywhere.com"
 
     fun build(): IAPIService {
         val retrofit = Retrofit.Builder().addCallAdapterFactory(RxJava2CallAdapterFactory.create())

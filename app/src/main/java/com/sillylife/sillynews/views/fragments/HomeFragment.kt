@@ -75,8 +75,8 @@ class HomeFragment : BaseFragment() {
                 .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
                     override fun onSuccess(t: Response<HomeDataResponse>) {
                         if (t.body() != null) {
-                            val s = t.body()?.rssItems!![2].title
-                            Log.d("rss", s)
+//                            val s = t.body()?.rssItems!![2].title
+//                            Log.d("rss", s)
                             setHomeAdapter(t.body()!!)
                         }
                     }

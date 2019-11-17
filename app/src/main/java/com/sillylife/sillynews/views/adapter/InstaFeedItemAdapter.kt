@@ -32,9 +32,11 @@ class InstaFeedItemAdapter(val context: Context,
                 holder.instaUsername.text = dataItem.profile?.username!!
                 ImageManager.loadImageCircular(holder.instaProfilePicture, dataItem.profile?.instaProfilePhoto!!)
             }
-            holder.instaLocation.text = dataItem.location!!
+            if (dataItem.location != null) {
+                holder.instaLocation.text = dataItem.location!!
+            }
+            ImageManager.loadImage(holder.instaPost, dataItem.thumbnail_src)
             ImageManager.loadImage(holder.instaPost, dataItem.display_url)
-
             holder.containerView.setOnClickListener {
                 listener(dataItem, holder.adapterPosition)
             }

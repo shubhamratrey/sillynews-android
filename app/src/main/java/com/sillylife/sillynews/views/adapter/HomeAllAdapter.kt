@@ -5,12 +5,15 @@ import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.responses.HomeDataResponse
+import com.sillylife.sillynews.utils.CommonUtil
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_home_insta.*
 
 
 class HomeAllAdapter(
@@ -118,7 +121,33 @@ class HomeAllAdapter(
     private fun setInstaFeed(holder: HomeAllViewPagerHolder) {
         val homeDataItem = commonItemLists[holder.adapterPosition] as HomeDataItem
         if (homeDataItem.instaFeed != null) {
+//
+//        if (holder.commonRcv.itemDecorationCount == 0) {
+//            val resource = context.resources
+//            val startMargin = resource.getDimensionPixelSize(R.dimen.dp_14)
+//            val endMargin = resource.getDimensionPixelSize(R.dimen.dp_8)
+//            val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
+//            val bottomMargin = resource.getDimensionPixelSize(R.dimen.dp_9)
+//            holder.commonRcv.addItemDecoration(MixedItemDecoration(startMargin, betweenMargin, endMargin, bottomMargin))
+//        }
+            holder.commonRcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            val adapter = InstaFeedItemAdapter(context, homeDataItem.instaFeed!!) { it, position ->
+                listener(it, position)
+            }
+            //adapter.setHasStableIds(true)
+            holder.commonRcv.setHasFixedSize(true)
+            holder.commonRcv.setItemViewCacheSize(10)
+            holder.commonRcv.isNestedScrollingEnabled = false
+            holder.commonRcv.adapter = adapter
+            holder.commonRcv.clearOnScrollListeners()
+            holder.commonRcv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
 
+                    }
+                }
+            })
         }
     }
 
@@ -129,7 +158,27 @@ class HomeAllAdapter(
     private fun setNewsGroup(holder: HomeAllViewPagerHolder) {
         val homeDataItem = commonItemLists[holder.adapterPosition] as HomeDataItem
         if (homeDataItem.news != null) {
+            if (holder.commonRcv.itemDecorationCount == 0) {
+                holder.commonRcv.addItemDecoration(RadiosItemDecoration(0, CommonUtil.dpToPx(10), 0))
+            }
+            holder.commonRcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            val adapter = NewsItemAdapter(context, homeDataItem.news!!) { it, position ->
+                listener(it, position)
+            }
+            //adapter.setHasStableIds(true)
+            holder.commonRcv.setHasFixedSize(true)
+            holder.commonRcv.setItemViewCacheSize(10)
+            holder.commonRcv.isNestedScrollingEnabled = false
+            holder.commonRcv.adapter = adapter
+            holder.commonRcv.clearOnScrollListeners()
+            holder.commonRcv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
 
+                    }
+                }
+            })
         }
     }
 
@@ -189,7 +238,7 @@ class HomeAllAdapter(
                 state: RecyclerView.State
         ) {
             val position = parent.getChildAdapterPosition(view)
-            val adapter = parent.adapter as HomeAllAdapter
+            val adapter = parent.adapter as NewsItemAdapter
             if (position != RecyclerView.NO_POSITION) {
                 when (position) {
                     0 -> {

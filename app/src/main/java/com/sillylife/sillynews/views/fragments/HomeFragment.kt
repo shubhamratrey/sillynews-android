@@ -11,6 +11,7 @@ import com.sillylife.sillynews.R
 import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
+import com.sillylife.sillynews.models.InstaItem
 import com.sillylife.sillynews.models.NewsItem
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.services.AppDisposable
@@ -93,6 +94,8 @@ class HomeFragment : BaseFragment() {
                     }
                 } else if (it is NewsItem) {
                     (activity as MainActivity).addFragment(WebViewFragment.newInstance(it.link!!), FragmentHelper.HOME_TO_WEBVIEW)
+                } else if (it is InstaItem) {
+                    (activity as MainActivity).addFragment(WebViewFragment.newInstance(it.profile?.instaProfileLink!!), FragmentHelper.HOME_TO_WEBVIEW)
                 }
             }
             if (rcvAll?.itemDecorationCount == 0) {

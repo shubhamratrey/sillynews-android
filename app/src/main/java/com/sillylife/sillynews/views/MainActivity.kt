@@ -7,17 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.utils.FragmentHelper
-import com.sillylife.sillynews.views.fragments.HomeFragment
+import com.sillylife.sillynews.views.fragments.NewsFragment
 
 
 class MainActivity : AppCompatActivity() {
 
-    var homeFragment: HomeFragment? = null
+    var homeFragment: NewsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        homeFragment = HomeFragment.newInstance()
+        homeFragment = NewsFragment.newInstance()
         FragmentHelper.replace(R.id.container, supportFragmentManager, homeFragment!!, FragmentHelper.HOME)
     }
 

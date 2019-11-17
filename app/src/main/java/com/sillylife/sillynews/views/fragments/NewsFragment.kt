@@ -20,17 +20,17 @@ import com.sillylife.sillynews.services.NetworkConstants
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.FragmentHelper
 import com.sillylife.sillynews.views.MainActivity
-import com.sillylife.sillynews.views.adapter.HomeAllAdapter
+import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_scrolling.*
 import retrofit2.Response
 import java.util.*
 
-class HomeFragment : BaseFragment() {
+class NewsFragment : BaseFragment() {
 
     companion object {
-        fun newInstance() = HomeFragment()
+        fun newInstance() = NewsFragment()
     }
 
 
@@ -45,12 +45,10 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        context.setSupportActionBar(toolbar)
-//        toolbar.title = "SillyNews"
         swipeRefresh.isRefreshing = true
         swipeRefresh.setOnRefreshListener {
-            val homeAllViewPagerAdapter = rcvAll.adapter as HomeAllAdapter
-            homeAllViewPagerAdapter.clearData()
+            val adapter = rcvAll.adapter as NewsAllAdapter
+            adapter.clearData()
             rcvAll?.adapter = null
             getRssData(initialPageNo, initialRssPageNo)
         }
@@ -96,7 +94,7 @@ class HomeFragment : BaseFragment() {
     private fun setHomeAdapter(homeDataResponse: HomeDataResponse) {
         swipeRefresh.isRefreshing = false
         if (rcvAll?.adapter == null) {
-            val homeAllViewPagerAdapter = HomeAllAdapter(context!!, homeDataResponse) { it, position, rssPageNo ->
+            val adapter = NewsAllAdapter(context!!, homeDataResponse) { it, position, rssPageNo ->
                 if (it is Int) {
                     getRssData(it, rssPageNo)
                 } else if (it is RssDataItem) {
@@ -104,14 +102,14 @@ class HomeFragment : BaseFragment() {
                 }
             }
             if (rcvAll?.itemDecorationCount == 0) {
-                rcvAll?.addItemDecoration(HomeAllAdapter.ItemDecoration(CommonUtil.dpToPx(20), CommonUtil.dpToPx(25), CommonUtil.dpToPx(20), CommonUtil.dpToPx(15), CommonUtil.dpToPx(70)))
+                rcvAll?.addItemDecoration(NewsAllAdapter.ItemDecoration(CommonUtil.dpToPx(20), CommonUtil.dpToPx(25), CommonUtil.dpToPx(20), CommonUtil.dpToPx(15), CommonUtil.dpToPx(70)))
             }
             rcvAll?.layoutManager = LinearLayoutManager(context)
             rcvAll?.setItemViewCacheSize(10)
-            rcvAll?.adapter = homeAllViewPagerAdapter
+            rcvAll?.adapter = adapter
         } else {
-            val homeAllViewPagerAdapter = rcvAll.adapter as HomeAllAdapter
-            homeAllViewPagerAdapter.addMoreData(homeDataResponse)
+            val adapter = rcvAll.adapter as NewsAllAdapter
+            adapter.addMoreData(homeDataResponse)
         }
     }
 

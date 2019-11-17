@@ -14,16 +14,16 @@ import com.sillylife.sillynews.utils.ImageManager
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_home_news.*
 
-class HomeAllAdapter(
+class NewsAllAdapter(
         val context: Context,
         val homeDataResponse: HomeDataResponse,
-        val listener: (Any, Int, Int) -> Unit) : RecyclerView.Adapter<HomeAllAdapter.ViewHolder>() {
+        val listener: (Any, Int, Int) -> Unit) : RecyclerView.Adapter<NewsAllAdapter.ViewHolder>() {
 
     val commonItemLists = ArrayList<Any>()
     var pageNo = 1
     var rssPageNo = 1
     var scrollBackPosition: Int = 6
-    var TAG = HomeAllAdapter::class.java.simpleName
+    var TAG = NewsAllAdapter::class.java.simpleName
 
 
     companion object {

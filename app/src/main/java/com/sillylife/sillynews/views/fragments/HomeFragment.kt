@@ -12,13 +12,14 @@ import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.models.NewsItem
-import com.sillylife.sillynews.models.responses.NewsDataResponse
+import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.services.AppDisposable
 import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.NetworkConstants
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.FragmentHelper
 import com.sillylife.sillynews.views.MainActivity
+import com.sillylife.sillynews.views.adapter.HomeAllAdapter
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -26,37 +27,25 @@ import kotlinx.android.synthetic.main.fragment_news.*
 import retrofit2.Response
 import java.util.*
 
-class NewsFragment : BaseFragment() {
+class HomeFragment : BaseFragment() {
 
     companion object {
-        fun newInstance() = NewsFragment()
+        fun newInstance() = HomeFragment()
     }
-
-
-    private val initialPageNo = 1
-    private val initialRssPageNo = 1
 
     var appDisposable: AppDisposable = AppDisposable()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return LayoutInflater.from(activity).inflate(R.layout.fragment_news, null, false)
+        return LayoutInflater.from(context).inflate(R.layout.fragment_news, null, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        swipeRefresh.isRefreshing = true
-        swipeRefresh.setOnRefreshListener {
-            val adapter = rcvAll.adapter as NewsAllAdapter
-            adapter.clearData()
-            rcvAll?.adapter = null
-            getRssData(initialPageNo, initialRssPageNo)
-        }
-
         appDisposable.add(RxBus.listen(RxEvent.NetworkConnectivity::class.java).subscribe { action ->
             Log.d("onNetworkConnection 2", action.isConnected.toString())
             if (action.isConnected) {
                 if (rcvAll?.adapter == null) {
-                    getRssData(initialPageNo, initialRssPageNo)
+                    getHomeData(1)
                 }
             } else {
                 Toast.makeText(context, "Make sure you have working internet connection", Toast.LENGTH_SHORT).show()
@@ -66,16 +55,15 @@ class NewsFragment : BaseFragment() {
     }
 
     @SuppressLint("CheckResult")
-    fun getRssData(pageNo: Int, rssPageNo: Int) {
+    fun getHomeData(pageNo: Int) {
         val hashMap = HashMap<String, String>()
         hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
-        hashMap[NetworkConstants.API_PATH_QUERY_RSS_PAGE] = rssPageNo.toString()
         SillyNews.getInstance().getAPIService()
-                .getNewsData(hashMap)
+                .getHomeData(hashMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<NewsDataResponse>>() {
-                    override fun onSuccess(t: Response<NewsDataResponse>) {
+                .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
+                    override fun onSuccess(t: Response<HomeDataResponse>) {
                         if (t.body() != null) {
 //                            val s = t.body()?.rssItems!![2].title
 //                            Log.d("rss", s)
@@ -89,12 +77,20 @@ class NewsFragment : BaseFragment() {
                 })
     }
 
-    private fun setHomeAdapter(newsDataResponse: NewsDataResponse) {
+    private fun setHomeAdapter(response: HomeDataResponse) {
         swipeRefresh.isRefreshing = false
         if (rcvAll?.adapter == null) {
-            val adapter = NewsAllAdapter(context!!, newsDataResponse) { it, position, rssPageNo ->
+            val adapter = HomeAllAdapter(context!!, response) { it, position ->
                 if (it is Int) {
-                    getRssData(it, rssPageNo)
+                    if (it > 0) {
+                        getHomeData(it)
+                    } else {
+                        if (it == HomeAllAdapter.SCROLLBACK_SHOW_ID) {
+//                            scrollBack.visibility = View.VISIBLE
+                        } else if (it == HomeAllAdapter.SCROLLBACK_HIDE_ID) {
+//                            scrollBack.visibility = View.GONE
+                        }
+                    }
                 } else if (it is NewsItem) {
                     (activity as MainActivity).addFragment(WebViewFragment.newInstance(it.link!!), FragmentHelper.HOME_TO_WEBVIEW)
                 }
@@ -106,8 +102,8 @@ class NewsFragment : BaseFragment() {
             rcvAll?.setItemViewCacheSize(10)
             rcvAll?.adapter = adapter
         } else {
-            val adapter = rcvAll.adapter as NewsAllAdapter
-            adapter.addMoreData(newsDataResponse)
+            val adapter = rcvAll.adapter as HomeAllAdapter
+            adapter.addMoreData(response)
         }
     }
 

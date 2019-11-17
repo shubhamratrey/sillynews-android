@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
-import com.sillylife.sillynews.models.RssDataItem
+import com.sillylife.sillynews.models.NewsItem
 import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.ImageManager
@@ -49,7 +49,7 @@ class NewsAllAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (commonItemLists[position] is RssDataItem) {
+        return if (commonItemLists[position] is NewsItem) {
             NEWS
         } else {
             PROGRESS_VIEW
@@ -96,7 +96,7 @@ class NewsAllAdapter(
     }
 
     private fun setNewsView(holder: ViewHolder, position: Int) {
-        val item = commonItemLists[position] as RssDataItem
+        val item = commonItemLists[position] as NewsItem
         holder.newsTitle.text = item.title
         if (item.description != null && !CommonUtil.textIsEmpty(item.description)) {
             holder.newsDescription.text = item.description

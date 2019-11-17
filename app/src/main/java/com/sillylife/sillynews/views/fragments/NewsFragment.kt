@@ -11,7 +11,7 @@ import com.sillylife.sillynews.R
 import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
-import com.sillylife.sillynews.models.RssDataItem
+import com.sillylife.sillynews.models.NewsItem
 import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.services.AppDisposable
 import com.sillylife.sillynews.services.CallbackWrapper
@@ -95,7 +95,7 @@ class NewsFragment : BaseFragment() {
             val adapter = NewsAllAdapter(context!!, newsDataResponse) { it, position, rssPageNo ->
                 if (it is Int) {
                     getRssData(it, rssPageNo)
-                } else if (it is RssDataItem) {
+                } else if (it is NewsItem) {
                     (activity as MainActivity).addFragment(WebViewFragment.newInstance(it.link!!), FragmentHelper.HOME_TO_WEBVIEW)
                 }
             }

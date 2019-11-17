@@ -9,6 +9,6 @@ data class NewsItem(
         var title: String?,
         var description: String?,
         var link: String?,
-        val images: RssImage?,
+        val images: NewsImage?,
         @SerializedName("published_date") var dateTime: String?,
         var source: String?) : Parcelable

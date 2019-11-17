@@ -5,6 +5,6 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class RssImage(
+data class NewsImage(
         @SerializedName("original_image") var original: String?,
         @SerializedName("thumbnail_url") var thumbnail: String?) : Parcelable

@@ -2,6 +2,7 @@ package com.sillylife.sillynews.views.adapter
 
 import android.content.Context
 import android.graphics.Rect
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,9 @@ import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.ImageManager
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_home_news.*
+import androidx.recyclerview.widget.LinearLayoutManager
+
+
 
 class NewsAllAdapter(
         val context: Context,
@@ -66,18 +70,19 @@ class NewsAllAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        when (holder.itemViewType) {
-            NEWS -> {
-                setNewsView(holder, position)
-            }
+        if (position != -1) {
+            when (holder.itemViewType) {
+                NEWS -> {
+                    setNewsView(holder, position)
+                }
 
-        }
-        if (holder.adapterPosition == itemCount - 1) {
-            if (homeDataResponse.hasMore != null && homeDataResponse.hasMore!!) {
-                listener(pageNo, -1, rssPageNo)
-            } else if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!) {
-                listener(1, -1, rssPageNo)
             }
+            if (holder.adapterPosition == itemCount - 1) {
+                if (homeDataResponse.hasMore != null && homeDataResponse.hasMore!!) {
+                    listener(pageNo, -1, rssPageNo)
+                } else if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!) {
+                    listener(1, -1, rssPageNo)
+                }
 
 //            if (position > scrollBackPosition) {
 //                // show scroll back visible
@@ -86,6 +91,7 @@ class NewsAllAdapter(
 //                // hide scroll back visible
 //                listener(SCROLLBACK_HIDE_ID, -1, rssPageNo)
 //            }
+            }
         }
     }
 
@@ -173,4 +179,16 @@ class NewsAllAdapter(
     }
 
     class ViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer
+
+    class WrapContentLinearLayoutManager(context: Context) : LinearLayoutManager(context) {
+        //... constructor
+        override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State) {
+            try {
+                super.onLayoutChildren(recycler, state)
+            } catch (e: IndexOutOfBoundsException) {
+                Log.e("TAG", "meet a IOOBE in RecyclerView")
+            }
+
+        }
+    }
 }

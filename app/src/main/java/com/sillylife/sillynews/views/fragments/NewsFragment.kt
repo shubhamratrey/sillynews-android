@@ -70,7 +70,6 @@ class NewsFragment : BaseFragment() {
     fun getRssData(pageNo: Int, rssPageNo: Int) {
         val hashMap = HashMap<String, String>()
         hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
-        hashMap[NetworkConstants.API_PATH_QUERY_PAGE_SIZE] = 20.toString()
         hashMap[NetworkConstants.API_PATH_QUERY_RSS_PAGE] = rssPageNo.toString()
         SillyNews.getInstance().getAPIService()
                 .getHomeData(hashMap)
@@ -104,7 +103,7 @@ class NewsFragment : BaseFragment() {
             if (rcvAll?.itemDecorationCount == 0) {
                 rcvAll?.addItemDecoration(NewsAllAdapter.ItemDecoration(CommonUtil.dpToPx(20), CommonUtil.dpToPx(25), CommonUtil.dpToPx(20), CommonUtil.dpToPx(15), CommonUtil.dpToPx(70)))
             }
-            rcvAll?.layoutManager = LinearLayoutManager(context)
+            rcvAll?.layoutManager = NewsAllAdapter.WrapContentLinearLayoutManager(context!!)
             rcvAll?.setItemViewCacheSize(10)
             rcvAll?.adapter = adapter
         } else {

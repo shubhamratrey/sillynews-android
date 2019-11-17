@@ -13,7 +13,7 @@ import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.ImageManager
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_home_news.*
+import kotlinx.android.synthetic.main.item_news.*
 import androidx.recyclerview.widget.LinearLayoutManager
 
 
@@ -58,7 +58,7 @@ class NewsAllAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = when (viewType) {
-            NEWS -> LayoutInflater.from(context).inflate(R.layout.item_home_news, parent, false)
+            NEWS -> LayoutInflater.from(context).inflate(R.layout.item_news, parent, false)
             PROGRESS_VIEW -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
             else -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
         }

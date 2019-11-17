@@ -22,7 +22,7 @@ import com.sillylife.sillynews.views.MainActivity
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.content_scrolling.*
+import kotlinx.android.synthetic.main.fragment_news.*
 import retrofit2.Response
 import java.util.*
 
@@ -38,7 +38,7 @@ class NewsFragment : BaseFragment() {
 
     var appDisposable: AppDisposable = AppDisposable()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return LayoutInflater.from(activity).inflate(R.layout.fragment_home, null, false)
+        return LayoutInflater.from(activity).inflate(R.layout.fragment_news, null, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

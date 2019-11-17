@@ -7,13 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.models.RssDataItem
-import com.sillylife.sillynews.models.responses.HomeDataResponse
+import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.services.AppDisposable
 import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.NetworkConstants
@@ -75,8 +74,8 @@ class NewsFragment : BaseFragment() {
                 .getHomeData(hashMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
-                    override fun onSuccess(t: Response<HomeDataResponse>) {
+                .subscribeWith(object : CallbackWrapper<Response<NewsDataResponse>>() {
+                    override fun onSuccess(t: Response<NewsDataResponse>) {
                         if (t.body() != null) {
 //                            val s = t.body()?.rssItems!![2].title
 //                            Log.d("rss", s)
@@ -90,10 +89,10 @@ class NewsFragment : BaseFragment() {
                 })
     }
 
-    private fun setHomeAdapter(homeDataResponse: HomeDataResponse) {
+    private fun setHomeAdapter(newsDataResponse: NewsDataResponse) {
         swipeRefresh.isRefreshing = false
         if (rcvAll?.adapter == null) {
-            val adapter = NewsAllAdapter(context!!, homeDataResponse) { it, position, rssPageNo ->
+            val adapter = NewsAllAdapter(context!!, newsDataResponse) { it, position, rssPageNo ->
                 if (it is Int) {
                     getRssData(it, rssPageNo)
                 } else if (it is RssDataItem) {
@@ -108,7 +107,7 @@ class NewsFragment : BaseFragment() {
             rcvAll?.adapter = adapter
         } else {
             val adapter = rcvAll.adapter as NewsAllAdapter
-            adapter.addMoreData(homeDataResponse)
+            adapter.addMoreData(newsDataResponse)
         }
     }
 

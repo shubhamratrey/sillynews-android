@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.models.RssDataItem
-import com.sillylife.sillynews.models.responses.HomeDataResponse
+import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.ImageManager
 import kotlinx.android.extensions.LayoutContainer
@@ -19,9 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 
 class NewsAllAdapter(
-        val context: Context,
-        val homeDataResponse: HomeDataResponse,
-        val listener: (Any, Int, Int) -> Unit) : RecyclerView.Adapter<NewsAllAdapter.ViewHolder>() {
+    val context: Context,
+    val newsDataResponse: NewsDataResponse,
+    val listener: (Any, Int, Int) -> Unit) : RecyclerView.Adapter<NewsAllAdapter.ViewHolder>() {
 
     val commonItemLists = ArrayList<Any>()
     var pageNo = 1
@@ -39,10 +39,10 @@ class NewsAllAdapter(
     }
 
     init {
-        if (homeDataResponse.rssItems != null && homeDataResponse.rssItems!!.isNotEmpty()) {
+        if (newsDataResponse.rssItems != null && newsDataResponse.rssItems!!.isNotEmpty()) {
             pageNo++
-            commonItemLists.addAll(homeDataResponse.rssItems!!)
-            if (homeDataResponse.hasMore != null && homeDataResponse.hasMore!!) {
+            commonItemLists.addAll(newsDataResponse.rssItems!!)
+            if (newsDataResponse.hasMore != null && newsDataResponse.hasMore!!) {
                 commonItemLists.add(PROGRESS_VIEW)
             }
         }
@@ -78,9 +78,9 @@ class NewsAllAdapter(
 
             }
             if (holder.adapterPosition == itemCount - 1) {
-                if (homeDataResponse.hasMore != null && homeDataResponse.hasMore!!) {
+                if (newsDataResponse.hasMore != null && newsDataResponse.hasMore!!) {
                     listener(pageNo, -1, rssPageNo)
-                } else if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!) {
+                } else if (!newsDataResponse.hasMore!! && newsDataResponse.hasMoreRss!!) {
                     listener(1, -1, rssPageNo)
                 }
 
@@ -136,20 +136,20 @@ class NewsAllAdapter(
         }
     }
 
-    fun addMoreData(homeDataResponse: HomeDataResponse) {
+    fun addMoreData(newsDataResponse: NewsDataResponse) {
         val oldSize = itemCount
         commonItemLists.remove(PROGRESS_VIEW)
-        if (homeDataResponse.rssItems != null && homeDataResponse.rssItems!!.isNotEmpty()) {
+        if (newsDataResponse.rssItems != null && newsDataResponse.rssItems!!.isNotEmpty()) {
             pageNo++
-            this.homeDataResponse.rssItems!!.addAll(homeDataResponse.rssItems!!)
-            this.homeDataResponse.hasMore = homeDataResponse.hasMore
-            this.homeDataResponse.hasMoreRss = homeDataResponse.hasMoreRss
-            commonItemLists.addAll(homeDataResponse.rssItems!!)
+            this.newsDataResponse.rssItems!!.addAll(newsDataResponse.rssItems!!)
+            this.newsDataResponse.hasMore = newsDataResponse.hasMore
+            this.newsDataResponse.hasMoreRss = newsDataResponse.hasMoreRss
+            commonItemLists.addAll(newsDataResponse.rssItems!!)
         }
-        if (homeDataResponse.hasMore!!) {
+        if (newsDataResponse.hasMore!!) {
             commonItemLists.add(PROGRESS_VIEW)
         }
-        if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!){
+        if (!newsDataResponse.hasMore!! && newsDataResponse.hasMoreRss!!){
             rssPageNo++
             pageNo=1
         }

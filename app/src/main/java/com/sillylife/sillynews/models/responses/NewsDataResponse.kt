@@ -6,7 +6,7 @@ import com.sillylife.sillynews.models.RssDataItem
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class HomeDataResponse(
+data class NewsDataResponse(
     @SerializedName("data") var rssItems: ArrayList<RssDataItem>?,
     @SerializedName("has_more") var hasMore: Boolean?,
     @SerializedName("has_more_rss") var hasMoreRss: Boolean?

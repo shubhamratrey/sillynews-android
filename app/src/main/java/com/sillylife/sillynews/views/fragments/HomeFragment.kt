@@ -33,6 +33,10 @@ class HomeFragment : BaseFragment() {
         fun newInstance() = HomeFragment()
     }
 
+
+    private val initialPageNo = 1
+    private val initialRssPageNo = 1
+
     var appDisposable: AppDisposable = AppDisposable()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return LayoutInflater.from(activity).inflate(R.layout.fragment_home, null, false)
@@ -48,14 +52,14 @@ class HomeFragment : BaseFragment() {
             val homeAllViewPagerAdapter = rcvAll.adapter as HomeAllAdapter
             homeAllViewPagerAdapter.clearData()
             rcvAll?.adapter = null
-            getRssData(0)
+            getRssData(initialPageNo, initialRssPageNo)
         }
 
         appDisposable.add(RxBus.listen(RxEvent.NetworkConnectivity::class.java).subscribe { action ->
             Log.d("onNetworkConnection 2", action.isConnected.toString())
             if (action.isConnected) {
                 if (rcvAll?.adapter == null) {
-                    getRssData(0)
+                    getRssData(initialPageNo, initialRssPageNo)
                 }
             } else {
                 Toast.makeText(context, "Make sure you have working internet connection", Toast.LENGTH_SHORT).show()
@@ -65,9 +69,11 @@ class HomeFragment : BaseFragment() {
     }
 
     @SuppressLint("CheckResult")
-    fun getRssData(pageNo: Int) {
+    fun getRssData(pageNo: Int, rssPageNo: Int) {
         val hashMap = HashMap<String, String>()
         hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
+        hashMap[NetworkConstants.API_PATH_QUERY_PAGE_SIZE] = 20.toString()
+        hashMap[NetworkConstants.API_PATH_QUERY_RSS_PAGE] = rssPageNo.toString()
         SillyNews.getInstance().getAPIService()
                 .getHomeData(hashMap)
                 .subscribeOn(Schedulers.io())
@@ -90,11 +96,9 @@ class HomeFragment : BaseFragment() {
     private fun setHomeAdapter(homeDataResponse: HomeDataResponse) {
         swipeRefresh.isRefreshing = false
         if (rcvAll?.adapter == null) {
-            val homeAllViewPagerAdapter = HomeAllAdapter(context!!, homeDataResponse) { it, position ->
+            val homeAllViewPagerAdapter = HomeAllAdapter(context!!, homeDataResponse) { it, position, rssPageNo ->
                 if (it is Int) {
-                    if (it > 0) {
-                        getRssData(it)
-                    }
+                    getRssData(it, rssPageNo)
                 } else if (it is RssDataItem) {
                     (activity as MainActivity).addFragment(WebViewFragment.newInstance(it.link!!), FragmentHelper.HOME_TO_WEBVIEW)
                 }

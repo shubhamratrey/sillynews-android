@@ -12,6 +12,8 @@ object NetworkConstants {
     const val V1_6 = "$PATH/v1.6"
 
     const val API_PATH_QUERY_PAGE = "page"
+    const val API_PATH_QUERY_RSS_PAGE = "rss_page"
+    const val API_PATH_QUERY_PAGE_SIZE = "page_size"
     const val API_PATH_QUERY_TYPE = "type"
     const val API_PATH_QUERY_LANG = "lang"
     const val API_PATH_QUERY_GENRE = "genre"

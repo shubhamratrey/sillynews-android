@@ -17,10 +17,11 @@ import kotlinx.android.synthetic.main.item_home_news.*
 class HomeAllAdapter(
         val context: Context,
         val homeDataResponse: HomeDataResponse,
-        val listener: (Any, Int) -> Unit) : RecyclerView.Adapter<HomeAllAdapter.ViewHolder>() {
+        val listener: (Any, Int, Int) -> Unit) : RecyclerView.Adapter<HomeAllAdapter.ViewHolder>() {
 
     val commonItemLists = ArrayList<Any>()
-    var pageNo = 0
+    var pageNo = 1
+    var rssPageNo = 1
     var scrollBackPosition: Int = 6
     var TAG = HomeAllAdapter::class.java.simpleName
 
@@ -73,16 +74,18 @@ class HomeAllAdapter(
         }
         if (holder.adapterPosition == itemCount - 1) {
             if (homeDataResponse.hasMore != null && homeDataResponse.hasMore!!) {
-                listener(pageNo, -1)
+                listener(pageNo, -1, rssPageNo)
+            } else if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!) {
+                listener(1, -1, rssPageNo)
             }
 
-            if (position > scrollBackPosition) {
-                // show scroll back visible
-                listener(SCROLLBACK_SHOW_ID, -1)
-            } else {
-                // hide scroll back visible
-                listener(SCROLLBACK_HIDE_ID, -1)
-            }
+//            if (position > scrollBackPosition) {
+//                // show scroll back visible
+//                listener(SCROLLBACK_SHOW_ID, -1, rssPageNo)
+//            } else {
+//                // hide scroll back visible
+//                listener(SCROLLBACK_HIDE_ID, -1, rssPageNo)
+//            }
         }
     }
 
@@ -122,7 +125,7 @@ class HomeAllAdapter(
 
         holder.rootLayout.setOnClickListener {
             if (item.link != null && !CommonUtil.textIsEmpty(item.link)) {
-                listener(item, position)
+                listener(item, position, rssPageNo)
             }
         }
     }
@@ -134,10 +137,15 @@ class HomeAllAdapter(
             pageNo++
             this.homeDataResponse.rssItems!!.addAll(homeDataResponse.rssItems!!)
             this.homeDataResponse.hasMore = homeDataResponse.hasMore
+            this.homeDataResponse.hasMoreRss = homeDataResponse.hasMoreRss
             commonItemLists.addAll(homeDataResponse.rssItems!!)
         }
         if (homeDataResponse.hasMore!!) {
             commonItemLists.add(PROGRESS_VIEW)
+        }
+        if (!homeDataResponse.hasMore!! && homeDataResponse.hasMoreRss!!){
+            rssPageNo++
+            pageNo=1
         }
         notifyItemRangeChanged(oldSize, itemCount)
     }

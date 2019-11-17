@@ -8,7 +8,7 @@ import retrofit2.http.QueryMap
 
 interface IAPIService {
 
-    @GET("${NetworkConstants.V1}/rss/")
+    @GET("${NetworkConstants.V1}/news/all")
     fun getHomeData(@QueryMap queryMap: Map<String, String>): Observable<Response<HomeDataResponse>>
 
 }

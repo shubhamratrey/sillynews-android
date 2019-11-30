@@ -254,7 +254,7 @@ class TaskAllAdapter(
         }
 
         override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-            if (actionState === ItemTouchHelper.ACTION_STATE_SWIPE) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                 try {
                     var width = viewHolder.itemView.width
                     val alpha = 1.0f - abs(dX) / width.toFloat()
@@ -263,15 +263,14 @@ class TaskAllAdapter(
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-
             } else {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
         }
 
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            if (commonItemLists[viewHolder.adapterPosition] is Task) {
-                return if (recyclerView.layoutManager is GridLayoutManager) {
+            return if (commonItemLists[viewHolder.adapterPosition] is Task) {
+                if (recyclerView.layoutManager is GridLayoutManager) {
                     val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
                     val swipeFlags = 0
                     ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
@@ -281,7 +280,7 @@ class TaskAllAdapter(
                     ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
                 }
             } else {
-                return 0
+                0
             }
         }
     }

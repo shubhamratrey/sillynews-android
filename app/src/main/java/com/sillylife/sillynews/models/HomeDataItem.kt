@@ -12,7 +12,10 @@ data class HomeDataItem(
     var slug: String?,
     var news: ArrayList<NewsItem>?,
     var category: String?,
+    @SerializedName("has_more") var hasMore: Boolean?,
     @SerializedName("insta_feed") var instaFeed: ArrayList<InstaItem>?,
     @SerializedName("content_type") var contentType: String?,
-    @SerializedName("user_info") var userInfo: UserProfile?
+    @SerializedName("user_info") var userInfo: UserProfile?,
+    @SerializedName("schedules") var schedules: ArrayList<Schedule>?,
+    @SerializedName("tasks") var tasks: ArrayList<Task>
 ) : Parcelable

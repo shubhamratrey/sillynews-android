@@ -18,6 +18,7 @@ import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.FirebaseAuthUserManager
 import com.sillylife.sillynews.utils.FragmentHelper
 import com.sillylife.sillynews.views.fragments.HomeFragment
+import com.sillylife.sillynews.views.fragments.TaskFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
@@ -26,6 +27,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     var homeFragment: HomeFragment? = null
+    var taskFragment: TaskFragment? = null
     val RC_SIGN_IN = 12132
     private val TAG = MainActivity::class.java.simpleName
 
@@ -49,6 +51,8 @@ class MainActivity : AppCompatActivity() {
             getUser()
         }
         homeFragment = HomeFragment.newInstance()
+        taskFragment = TaskFragment.newInstance()
+        FragmentHelper.replace(R.id.container, supportFragmentManager, taskFragment!!, FragmentHelper.HOME)
     }
 
     fun getUser(){
@@ -61,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                     override fun onSuccess(t: Response<UserResponse>) {
                         if (t.isSuccessful) {
                             Log.d(TAG, t.toString())
-                            FragmentHelper.replace(R.id.container, supportFragmentManager, homeFragment!!, FragmentHelper.HOME)
+                            FragmentHelper.replace(R.id.container, supportFragmentManager, taskFragment!!, FragmentHelper.HOME)
                         }
                     }
 

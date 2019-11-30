@@ -127,6 +127,7 @@ class TaskAllAdapter(
         val item = commonItemLists[holder.adapterPosition] as UserProfile?
         if (item != null) {
             holder.username.text = item.name
+            holder.wishTitle.text = "Good Morning,"
         }
     }
 
@@ -136,9 +137,9 @@ class TaskAllAdapter(
         if (homeDataItem.schedules != null) {
             if (holder.commonRcv.itemDecorationCount == 0) {
                 val resource = context.resources
-                val startMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
-                val endMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
-                val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
+                val startMargin = resource.getDimensionPixelSize(R.dimen.dp_20)
+                val endMargin = resource.getDimensionPixelSize(R.dimen.dp_20)
+                val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_5)
                 holder.commonRcv.addItemDecoration(SchedulesAdapter.ItemDecoration(startMargin, betweenMargin, endMargin))
             }
             holder.commonRcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

@@ -1,29 +1,32 @@
 package com.sillylife.sillynews.views.adapter
 
 import android.content.Context
-import android.graphics.Rect
+import android.graphics.Canvas
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.models.HomeDataItem
-import com.sillylife.sillynews.models.Schedule
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.UserProfile
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_home_brief.*
 import kotlinx.android.synthetic.main.item_home_insta.*
-import kotlinx.android.synthetic.main.item_schedule.view.*
 import kotlinx.android.synthetic.main.item_task.*
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 
 class TaskAllAdapter(
-    val context: Context,
-    private val response: HomeDataResponse,
-    val listener: (Any, Int) -> Unit
+        val context: Context,
+        private val response: HomeDataResponse,
+        val listener: (Any, Int, String) -> Unit
 ) : RecyclerView.Adapter<TaskAllAdapter.HomeAllViewPagerHolder>() {
 
     val commonItemLists = ArrayList<Any>()
@@ -44,14 +47,12 @@ class TaskAllAdapter(
     init {
         if (response.dataItems != null && response.dataItems!!.isNotEmpty()) {
             pageNo++
-//            commonItemLists.addAll(response.dataItems!!)
-
             response.dataItems!!.forEach {
-                if (it.type == USER_INFO){
+                if (it.type == USER_INFO) {
                     commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES){
+                } else if (it.type == SCHEDULES) {
                     commonItemLists.add(it)
-                } else if (it.type == TASKS){
+                } else if (it.type == TASKS) {
                     it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }
@@ -69,16 +70,7 @@ class TaskAllAdapter(
             commonItemLists[position] is Int -> PROGRESS_VIEW
             commonItemLists[position] is Task -> TASK
             commonItemLists[position] is UserProfile -> INFO
-            commonItemLists[position] is HomeDataItem-> SCHDEULE
-//            commonItemLists[position] is HomeDataItem -> {
-//                val homeDataItem = commonItemLists[position] as HomeDataItem
-//                when {
-//                    homeDataItem.type.equals(USER_INFO) -> INFO
-//                    homeDataItem.type.equals(SCHEDULES) -> SCHDEULE
-//                    homeDataItem.type.equals(TASKS) -> TASK
-//                    else -> PROGRESS_VIEW
-//                }
-//            }
+            commonItemLists[position] is HomeDataItem -> SCHDEULE
             else -> PROGRESS_VIEW
         }
     }
@@ -86,11 +78,7 @@ class TaskAllAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeAllViewPagerHolder {
         val view = when (viewType) {
             INFO -> LayoutInflater.from(context).inflate(R.layout.item_home_brief, parent, false)
-            SCHDEULE -> LayoutInflater.from(context).inflate(
-                R.layout.item_home_insta,
-                parent,
-                false
-            )
+            SCHDEULE -> LayoutInflater.from(context).inflate(R.layout.item_home_insta, parent, false)
             TASK -> LayoutInflater.from(context).inflate(R.layout.item_task, parent, false)
             else -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
         }
@@ -115,7 +103,7 @@ class TaskAllAdapter(
         }
         if (holder.adapterPosition == itemCount - 1) {
             if (response.hasMore != null && response.hasMore!!) {
-                listener(pageNo, -1)
+                listener(pageNo, -1, "task")
             }
         }
     }
@@ -125,6 +113,12 @@ class TaskAllAdapter(
         if (item != null) {
             holder.task_title.text = item.title
         }
+//        holder.containerView.setOnTouchListener { v, event ->
+//            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+//                listener(item!!,holder.adapterPosition, "")
+//            }
+//            false
+//        }
     }
 
     private fun setInfo(holder: HomeAllViewPagerHolder) {
@@ -134,33 +128,26 @@ class TaskAllAdapter(
         }
     }
 
+    var schedulesAdapter: SchedulesAdapter? = null
     private fun setSchedules(holder: HomeAllViewPagerHolder) {
         val homeDataItem = commonItemLists[holder.adapterPosition] as HomeDataItem
         if (homeDataItem.schedules != null) {
-//
             if (holder.commonRcv.itemDecorationCount == 0) {
                 val resource = context.resources
                 val startMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
                 val endMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
                 val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_4)
-                holder.commonRcv.addItemDecoration(
-                    SchedulesAdapter.ItemDecoration(
-                        startMargin,
-                        betweenMargin,
-                        endMargin
-                    )
-                )
+                holder.commonRcv.addItemDecoration(SchedulesAdapter.ItemDecoration(startMargin, betweenMargin, endMargin))
             }
-            holder.commonRcv.layoutManager =
-                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            val adapter = SchedulesAdapter(context, homeDataItem) { it, position ->
-                listener(it, position)
+            holder.commonRcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            schedulesAdapter = SchedulesAdapter(context, homeDataItem) { it, position ->
+                listener(it, position, "schedule")
             }
             //adapter.setHasStableIds(true)
             holder.commonRcv.setHasFixedSize(true)
             holder.commonRcv.setItemViewCacheSize(10)
             holder.commonRcv.isNestedScrollingEnabled = false
-            holder.commonRcv.adapter = adapter
+            holder.commonRcv.adapter = schedulesAdapter
             holder.commonRcv.clearOnScrollListeners()
             holder.commonRcv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -173,6 +160,16 @@ class TaskAllAdapter(
         }
     }
 
+    fun addMoreScheduleData(response: HomeDataResponse) {
+        if (schedulesAdapter != null) {
+            response.dataItems!!.forEach {
+                if (it.type == SCHEDULES) {
+                    schedulesAdapter?.addMoreData(it)
+                }
+            }
+        }
+    }
+
     fun addMoreData(homeDataResponse: HomeDataResponse) {
         val oldSize = itemCount
         commonItemLists.remove(PROGRESS_VIEW)
@@ -180,13 +177,12 @@ class TaskAllAdapter(
             pageNo++
             this.response.dataItems!!.addAll(homeDataResponse.dataItems!!)
             this.response.hasMore = homeDataResponse.hasMore
-//            commonItemLists.addAll(homeDataResponse.dataItems!!)
             homeDataResponse.dataItems!!.forEach {
-                if (it.type == USER_INFO){
+                if (it.type == USER_INFO) {
                     commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES){
+                } else if (it.type == SCHEDULES) {
                     commonItemLists.add(it)
-                } else if (it.type == TASKS){
+                } else if (it.type == TASKS) {
                     it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }
@@ -199,35 +195,84 @@ class TaskAllAdapter(
         notifyItemRangeChanged(oldSize, itemCount)
     }
 
-    class HomeAllViewPagerHolder(override val containerView: View) :
-        RecyclerView.ViewHolder(containerView),
-        LayoutContainer
 
-    class ChannelsItemDecoration(val startMargin: Int, val betweenMargin: Int, val endMargin: Int) :
-        RecyclerView.ItemDecoration() {
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            val position = parent.getChildAdapterPosition(view)
-            val adapter = parent.adapter as TaskAllAdapter
-            if (position != RecyclerView.NO_POSITION) {
-                when (position) {
-                    0 -> {
-                        outRect.left = startMargin
-                        outRect.right = betweenMargin / 2
-                    }
-                    adapter.itemCount - 1 -> {
-                        outRect.right = endMargin
-                        outRect.left = betweenMargin / 2
-                    }
-                    else -> {
-                        outRect.right = betweenMargin / 2
-                        outRect.left = betweenMargin / 2
-                    }
+    class HomeAllViewPagerHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer
+
+    inner class RecyclerItemTouchHelper(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            if (commonItemLists[viewHolder.adapterPosition] is Task) {
+                val task = commonItemLists[viewHolder.adapterPosition] as Task
+                Collections.swap(commonItemLists, viewHolder.adapterPosition, target.adapterPosition);
+                notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition);
+                return true
+            }
+            return false
+        }
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            if (viewHolder != null) {
+                val foregroundView = (viewHolder as HomeAllViewPagerHolder).containerView
+                getDefaultUIUtil().onSelected(foregroundView)
+            }
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            val foregroundView = (viewHolder as HomeAllViewPagerHolder).containerView
+            getDefaultUIUtil().clearView(foregroundView)
+        }
+
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            if (commonItemLists[viewHolder.adapterPosition] is Task) {
+                val task = commonItemLists[viewHolder.adapterPosition] as Task
+                listener(task, viewHolder.adapterPosition, "")
+            }
+        }
+
+        override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
+            return super.convertToAbsoluteDirection(flags, layoutDirection)
+        }
+
+        override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            if (viewHolder.adapterPosition == -1 || viewHolder.adapterPosition > commonItemLists.size - 1) {
+                return 0
+            }
+            return if (commonItemLists[viewHolder.adapterPosition] is Task)
+                super.getSwipeDirs(recyclerView, viewHolder)
+            else
+                0
+        }
+
+        override fun isLongPressDragEnabled(): Boolean {
+            return true
+        }
+
+        override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+            if (actionState === ItemTouchHelper.ACTION_STATE_SWIPE) {
+                try {
+                    var width = viewHolder.itemView.width
+                    val alpha = 1.0f - abs(dX) / width.toFloat()
+                    viewHolder.itemView.alpha = alpha
+                    viewHolder.itemView.translationX = dX
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+
+            } else {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+        }
+
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            return if (recyclerView.layoutManager is GridLayoutManager) {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                val swipeFlags = 0
+                ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
+            } else {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+                ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
             }
         }
     }

@@ -182,14 +182,20 @@ class TaskAllAdapter(
             this.response.hasMore = homeDataResponse.hasMore
 //            commonItemLists.addAll(homeDataResponse.dataItems!!)
             homeDataResponse.dataItems!!.forEach {
-                commonItemLists.add(it.userInfo!!)
-                commonItemLists.addAll(it.schedules!!)
-                it.tasks.forEach { task ->
-                    commonItemLists.add(task)
+                if (it.type == USER_INFO){
+                    commonItemLists.add(it.userInfo!!)
+                } else if (it.type == SCHEDULES){
+                    commonItemLists.add(it)
+                } else if (it.type == TASKS){
+                    it.tasks.forEach { task ->
+                        commonItemLists.add(task)
+                    }
                 }
             }
+            if (homeDataResponse.hasMore!!) {
+                commonItemLists.add(PROGRESS_VIEW)
+            }
         }
-        commonItemLists.add(PROGRESS_VIEW)
         notifyItemRangeChanged(oldSize, itemCount)
     }
 

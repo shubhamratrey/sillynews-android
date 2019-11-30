@@ -1,6 +1,7 @@
 package com.sillylife.sillynews.views.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.Schedule
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_schedule.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class SchedulesAdapter(
@@ -82,6 +85,9 @@ class SchedulesAdapter(
         val item = commonItemLists[holder.adapterPosition] as Schedule
         holder.startTime.text = item.start_time
         holder.title.text = item.title
+        val rnd = Random()
+        val currentColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        holder.rootLayout.setCardBackgroundColor(currentColor)
 
     }
 

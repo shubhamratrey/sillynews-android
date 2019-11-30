@@ -108,7 +108,7 @@ class TaskFragment : BaseFragment() {
             rcvAll?.setItemViewCacheSize(10)
             rcvAll?.adapter = adapter
         } else {
-            val adapter = rcvAll.adapter as HomeAllAdapter
+            val adapter = rcvAll.adapter as TaskAllAdapter
             adapter.addMoreData(response)
         }
     }

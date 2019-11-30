@@ -150,7 +150,7 @@ class TaskFragment : BaseFragment() {
             val position = parent.getChildAdapterPosition(view)
             val viewType = parent.adapter!!.getItemViewType(position)
             if (position != RecyclerView.NO_POSITION) {
-                if (viewType == TaskAllAdapter.SCHDEULE) {
+                if (viewType == TaskAllAdapter.SCHEDULE) {
                     outRect.top = CommonUtil.dpToPx(20)
                     outRect.bottom = CommonUtil.dpToPx(20)
                 } else if (viewType == TaskAllAdapter.TASK) {

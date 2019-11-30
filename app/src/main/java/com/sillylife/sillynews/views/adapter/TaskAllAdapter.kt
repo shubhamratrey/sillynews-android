@@ -15,8 +15,9 @@ import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.UserProfile
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_header.*
 import kotlinx.android.synthetic.main.item_home_brief.*
-import kotlinx.android.synthetic.main.item_home_insta.*
+import kotlinx.android.synthetic.main.item_schedules.*
 import kotlinx.android.synthetic.main.item_task.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -35,9 +36,11 @@ class TaskAllAdapter(
     companion object {
         const val PROGRESS_VIEW = 0
         const val INFO = 1
-        const val SCHDEULE = 2
+        const val SCHEDULE = 2
         const val TASK = 3
+        const val HEADER = 4
         const val USER_INFO = "user_info"
+        const val TASKS_HEADER = "tasks_header"
         const val SCHEDULES = "schedules"
         const val TASKS = "tasks"
 
@@ -58,7 +61,7 @@ class TaskAllAdapter(
                     }
                 }
             }
-
+            commonItemLists.add(2, TASKS_HEADER)
             if (response.hasMore != null && response.hasMore!!) {
                 commonItemLists.add(PROGRESS_VIEW)
             }
@@ -68,9 +71,10 @@ class TaskAllAdapter(
     override fun getItemViewType(position: Int): Int {
         return when {
             commonItemLists[position] is Int -> PROGRESS_VIEW
+            commonItemLists[position] is String -> HEADER
             commonItemLists[position] is Task -> TASK
             commonItemLists[position] is UserProfile -> INFO
-            commonItemLists[position] is HomeDataItem -> SCHDEULE
+            commonItemLists[position] is HomeDataItem -> SCHEDULE
             else -> PROGRESS_VIEW
         }
     }
@@ -78,8 +82,9 @@ class TaskAllAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeAllViewPagerHolder {
         val view = when (viewType) {
             INFO -> LayoutInflater.from(context).inflate(R.layout.item_home_brief, parent, false)
-            SCHDEULE -> LayoutInflater.from(context).inflate(R.layout.item_home_insta, parent, false)
+            SCHEDULE -> LayoutInflater.from(context).inflate(R.layout.item_schedules, parent, false)
             TASK -> LayoutInflater.from(context).inflate(R.layout.item_task, parent, false)
+            HEADER -> LayoutInflater.from(context).inflate(R.layout.item_header, parent, false)
             else -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
         }
         return HomeAllViewPagerHolder(view)
@@ -94,11 +99,14 @@ class TaskAllAdapter(
             INFO -> {
                 setInfo(holder)
             }
-            SCHDEULE -> {
+            SCHEDULE -> {
                 setSchedules(holder)
             }
             TASK -> {
                 setTask(holder)
+            }
+            HEADER -> {
+                holder.header_text.text = "Tasks"
             }
         }
         if (holder.adapterPosition == itemCount - 1) {
@@ -113,12 +121,6 @@ class TaskAllAdapter(
         if (item != null) {
             holder.task_title.text = item.title
         }
-//        holder.containerView.setOnTouchListener { v, event ->
-//            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-//                listener(item!!,holder.adapterPosition, "")
-//            }
-//            false
-//        }
     }
 
     private fun setInfo(holder: HomeAllViewPagerHolder) {
@@ -201,6 +203,9 @@ class TaskAllAdapter(
     inner class RecyclerItemTouchHelper(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            if (target.adapterPosition == 0 || target.adapterPosition == 1 || target.adapterPosition == 2){
+                return false
+            }
             if (commonItemLists[viewHolder.adapterPosition] is Task) {
                 val task = commonItemLists[viewHolder.adapterPosition] as Task
                 Collections.swap(commonItemLists, viewHolder.adapterPosition, target.adapterPosition);
@@ -265,14 +270,18 @@ class TaskAllAdapter(
         }
 
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return if (recyclerView.layoutManager is GridLayoutManager) {
-                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                val swipeFlags = 0
-                ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
+            if (commonItemLists[viewHolder.adapterPosition] is Task) {
+                return if (recyclerView.layoutManager is GridLayoutManager) {
+                    val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                    val swipeFlags = 0
+                    ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
+                } else {
+                    val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                    val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+                    ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
+                }
             } else {
-                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
-                ItemTouchHelper.Callback.makeMovementFlags(dragFlags, swipeFlags)
+                return 0
             }
         }
     }

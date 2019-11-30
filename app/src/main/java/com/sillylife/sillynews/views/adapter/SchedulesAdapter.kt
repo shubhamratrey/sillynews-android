@@ -102,10 +102,12 @@ class SchedulesAdapter(
             response.schedules!!.forEach {
                 commonItemLists.add(it)
             }
-//            commonItemLists.addAll(response.schedules!!)
+
+            if (response.hasMore != null && response.hasMore!!) {
+                commonItemLists.add(PROGRESS_VIEW)
+            }
+            notifyItemRangeChanged(oldSize, itemCount)
         }
-        commonItemLists.add(PROGRESS_VIEW)
-        notifyItemRangeChanged(oldSize, itemCount)
     }
 
     class Holder(override val containerView: View) :

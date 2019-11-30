@@ -9,21 +9,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.models.HomeDataItem
-import com.sillylife.sillynews.models.Schedule
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.UserProfile
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_home_brief.*
 import kotlinx.android.synthetic.main.item_home_insta.*
-import kotlinx.android.synthetic.main.item_schedule.view.*
 import kotlinx.android.synthetic.main.item_task.*
 
 
 class TaskAllAdapter(
     val context: Context,
     private val response: HomeDataResponse,
-    val listener: (Any, Int) -> Unit
+    val listener: (Any, Int, String) -> Unit
 ) : RecyclerView.Adapter<TaskAllAdapter.HomeAllViewPagerHolder>() {
 
     val commonItemLists = ArrayList<Any>()
@@ -44,14 +42,12 @@ class TaskAllAdapter(
     init {
         if (response.dataItems != null && response.dataItems!!.isNotEmpty()) {
             pageNo++
-//            commonItemLists.addAll(response.dataItems!!)
-
             response.dataItems!!.forEach {
-                if (it.type == USER_INFO){
+                if (it.type == USER_INFO) {
                     commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES){
+                } else if (it.type == SCHEDULES) {
                     commonItemLists.add(it)
-                } else if (it.type == TASKS){
+                } else if (it.type == TASKS) {
                     it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }
@@ -69,16 +65,7 @@ class TaskAllAdapter(
             commonItemLists[position] is Int -> PROGRESS_VIEW
             commonItemLists[position] is Task -> TASK
             commonItemLists[position] is UserProfile -> INFO
-            commonItemLists[position] is HomeDataItem-> SCHDEULE
-//            commonItemLists[position] is HomeDataItem -> {
-//                val homeDataItem = commonItemLists[position] as HomeDataItem
-//                when {
-//                    homeDataItem.type.equals(USER_INFO) -> INFO
-//                    homeDataItem.type.equals(SCHEDULES) -> SCHDEULE
-//                    homeDataItem.type.equals(TASKS) -> TASK
-//                    else -> PROGRESS_VIEW
-//                }
-//            }
+            commonItemLists[position] is HomeDataItem -> SCHDEULE
             else -> PROGRESS_VIEW
         }
     }
@@ -115,7 +102,7 @@ class TaskAllAdapter(
         }
         if (holder.adapterPosition == itemCount - 1) {
             if (response.hasMore != null && response.hasMore!!) {
-                listener(pageNo, -1)
+                listener(pageNo, -1, "task")
             }
         }
     }
@@ -134,6 +121,7 @@ class TaskAllAdapter(
         }
     }
 
+    var schedulesAdapter: SchedulesAdapter? = null
     private fun setSchedules(holder: HomeAllViewPagerHolder) {
         val homeDataItem = commonItemLists[holder.adapterPosition] as HomeDataItem
         if (homeDataItem.schedules != null) {
@@ -153,14 +141,14 @@ class TaskAllAdapter(
             }
             holder.commonRcv.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            val adapter = SchedulesAdapter(context, homeDataItem) { it, position ->
-                listener(it, position)
+            schedulesAdapter = SchedulesAdapter(context, homeDataItem) { it, position ->
+                listener(it, position, "schedule")
             }
             //adapter.setHasStableIds(true)
             holder.commonRcv.setHasFixedSize(true)
             holder.commonRcv.setItemViewCacheSize(10)
             holder.commonRcv.isNestedScrollingEnabled = false
-            holder.commonRcv.adapter = adapter
+            holder.commonRcv.adapter = schedulesAdapter
             holder.commonRcv.clearOnScrollListeners()
             holder.commonRcv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -173,6 +161,16 @@ class TaskAllAdapter(
         }
     }
 
+    fun addMoreScheduleData(response: HomeDataResponse) {
+        if (schedulesAdapter != null) {
+            response.dataItems!!.forEach {
+                if (it.type == SCHEDULES) {
+                    schedulesAdapter?.addMoreData(it)
+                }
+            }
+        }
+    }
+
     fun addMoreData(homeDataResponse: HomeDataResponse) {
         val oldSize = itemCount
         commonItemLists.remove(PROGRESS_VIEW)
@@ -182,11 +180,11 @@ class TaskAllAdapter(
             this.response.hasMore = homeDataResponse.hasMore
 //            commonItemLists.addAll(homeDataResponse.dataItems!!)
             homeDataResponse.dataItems!!.forEach {
-                if (it.type == USER_INFO){
+                if (it.type == USER_INFO) {
                     commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES){
+                } else if (it.type == SCHEDULES) {
                     commonItemLists.add(it)
-                } else if (it.type == TASKS){
+                } else if (it.type == TASKS) {
                     it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }

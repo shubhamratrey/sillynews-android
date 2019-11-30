@@ -79,15 +79,44 @@ class TaskFragment : BaseFragment() {
                 })
     }
 
+    @SuppressLint("CheckResult")
+    fun getScheduleData(pageNo: Int) {
+        val hashMap = HashMap<String, String>()
+        hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
+        hashMap[NetworkConstants.API_PATH_QUERY_TYPE] = "schedules"
+        SillyNews.getInstance().getAPIService()
+            .getTaskData(hashMap)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
+                override fun onSuccess(t: Response<HomeDataResponse>) {
+                    if (t.body() != null) {
+//                            val s = t.body()?.rssItems!![2].title
+                        Log.d("getTaskData", t.body().toString())
+//                        setHomeAdapter(t.body()!!)
+                        val adapter = rcvAll.adapter as TaskAllAdapter
+                        adapter.addMoreScheduleData(t.body()!!)
+                    }
+                }
+
+                override fun onFailure(code: Int, message: String) {
+
+                }
+            })
+    }
 
 
     private fun setHomeAdapter(response: HomeDataResponse) {
         swipeRefresh.isRefreshing = false
         if (rcvAll?.adapter == null) {
-            val adapter = TaskAllAdapter(context!!, response) { it, position ->
+            val adapter = TaskAllAdapter(context!!, response) { it, position, type ->
                 if (it is Int) {
                     if (it > 0) {
-                        getHomeData(it)
+                        if (type == "schedule"){
+                            getScheduleData(it)
+                        } else {
+                            getHomeData(it)
+                        }
                     } else {
                         if (it == HomeAllAdapter.SCROLLBACK_SHOW_ID) {
 //                            scrollBack.visibility = View.VISIBLE

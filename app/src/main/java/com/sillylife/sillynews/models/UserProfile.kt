@@ -13,5 +13,8 @@ data class UserProfile(
         val username: String?,
         @SerializedName("profile_pic_url") var instaProfilePhoto: String?,
         @SerializedName("profile_pic_url_hd") var instaProfilePhotoHd: String?,
-        @SerializedName("profile_link") var instaProfileLink: String?
+        @SerializedName("profile_link") var instaProfileLink: String?,
+        @SerializedName("id") var id: Int?,
+        @SerializedName("sign_up_source") var signUpSource: String?,
+        @SerializedName("original_avatar") var originalAvatar: String?
 ) : Parcelable

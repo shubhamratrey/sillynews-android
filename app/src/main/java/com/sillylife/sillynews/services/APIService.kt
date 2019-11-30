@@ -2,6 +2,7 @@ package com.sillylife.sillynews.services
 
 import android.content.Context
 import com.sillylife.sillynews.BuildConfig
+import com.sillylife.sillynews.utils.CommonUtil
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -91,9 +92,9 @@ object APIService {
             val original = chain.request()
             val requestBuilder = original.newBuilder()
             requestBuilder.addHeader("content-type", "application/json")
-//            if(!CommonUtil.textIsEmpty(FirebaseAuthUserManager.getFirebaseAuthToken())){
-//                requestBuilder.addHeader("Authorization", "Bearer ${FirebaseAuthUserManager.getFirebaseAuthToken()}")
-//            }
+            if(!CommonUtil.textIsEmpty(FirebaseAuthUserManager.getFirebaseAuthToken())){
+                requestBuilder.addHeader("Authorization", "Bearer ${FirebaseAuthUserManager.getFirebaseAuthToken()}")
+            }
             if (cacheDuration > 0) {
                 requestBuilder.addHeader("Cache-Control", "public, max-age=$cacheDuration")
             }

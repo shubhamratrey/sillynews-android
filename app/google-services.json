@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "433914461460",
+    "firebase_url": "https://sillylife-news.firebaseio.com",
+    "project_id": "sillylife-news",
+    "storage_bucket": "sillylife-news.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433914461460:android:60efef7a5482d692",
+        "android_client_info": {
+          "package_name": "com.sillylife.news"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433914461460-s6agr72r75ndr84tva011oirktvdg6fa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sillylife.news",
+            "certificate_hash": "8a9fc92efc76a706b0333e511c094003bbc4e15f"
+          }
+        },
+        {
+          "client_id": "433914461460-ong6nj59r2r60unluovh7uocospeto99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCubtIxHqIVma9rlHpTHoOMnJiTk1m7dVA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433914461460-ong6nj59r2r60unluovh7uocospeto99.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433914461460:android:b9488ef72dd5329d3cd601",
+        "android_client_info": {
+          "package_name": "com.sillylife.sillynews"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "433914461460-rgrc5hsokj6vo1plsic9rc7r91pbh715.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sillylife.sillynews",
+            "certificate_hash": "ff9111068edd2e113edc95f34a315ada21089551"
+          }
+        },
+        {
+          "client_id": "433914461460-ong6nj59r2r60unluovh7uocospeto99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCubtIxHqIVma9rlHpTHoOMnJiTk1m7dVA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "433914461460-ong6nj59r2r60unluovh7uocospeto99.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

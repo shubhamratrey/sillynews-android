@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="UIComponentInputField">
+        <attr name="titleHint" format="string" />
+        <attr name="inputHint" format="string" />
+        <attr name="inputRightIcon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="UIComponentCircularButton">
+        <attr name="setImageResource" format="reference" />
+        <attr name="background" format="reference" />
+        <attr name="backgroundAlpha" format="float" />
+        <attr name="iconHeight" format="dimension" />
+        <attr name="iconWidth" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="UIComponentSocialButton">
+        <attr name="setCount" format="integer" />
+        <attr name="isEnabled" format="boolean" />
+        <attr name="setProgressVisibility" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="UIComponentToolbar">
+        <attr name="toobarTitle" format="string" />
+        <attr name="leftIcon" format="reference" />
+        <attr name="optionalMenu" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="UIComponentFans" />
+    <declare-styleable name="UIComponentAddPhoto" />
+    <declare-styleable name="UIComponentAddDocument" />
+
+    <declare-styleable name="UIComponentOtp">
+        <attr name="UIComponentOtp" format="reference" />
+        <attr name="itemCount" format="integer" />
+        <attr name="itemWidth" format="dimension" />
+        <attr name="itemHeight" format="dimension" />
+        <attr name="itemRadius" format="dimension" />
+        <attr name="itemSpacing" format="dimension" />
+        <attr name="lineWidth" format="dimension" />
+        <attr name="lineColor" format="reference|color" />
+        <attr name="viewType" format="enum">
+            <enum name="rectangle" value="0" />
+            <enum name="line" value="1" />
+            <enum name="none" value="2" />
+        </attr>
+        <attr name="android:cursorVisible" />
+        <attr name="cursorWidth" format="dimension" />
+        <attr name="cursorColor" format="reference|color" />
+        <attr name="android:itemBackground" />
+        <attr name="hideLineWhenFilled" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="CardView">
+        <!-- Shadow start color of CardView. -->
+        <attr name="cardShadowStartColor" format="color" />
+        <!-- Shadow end color of CardView. -->
+        <attr name="cardShadowEndColor" format="color" />
+        <!-- Background color for CardView. -->
+        <attr name="cardBackgroundColor" format="color" />
+        <!-- Corner radius for CardView. -->
+        <attr name="cardCornerRadius" format="dimension" />
+        <!-- Elevation for CardView. -->
+        <attr name="cardElevation" format="dimension" />
+        <!-- Maximum Elevation for CardView. -->
+        <attr name="cardMaxElevation" format="dimension" />
+        <!-- Add padding in API v21+ as well to have the same measurements with previous versions. -->
+        <attr name="cardUseCompatPadding" format="boolean" />
+        <attr name="showCardViewDefaultShadow" format="boolean" />
+        <!-- Add padding to CardView on v20 and before to prevent intersections between the Card content and rounded corners. -->
+        <attr name="cardPreventCornerOverlap" format="boolean" />
+        <!-- Inner padding between the edges of the Card and children of the CardView. -->
+        <attr name="contentPadding" format="dimension" />
+        <!-- Inner padding between the left edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingLeft" format="dimension" />
+        <!-- Inner padding between the right edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingRight" format="dimension" />
+        <!-- Inner padding between the top edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingTop" format="dimension" />
+        <!-- Inner padding between the bottom edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingBottom" format="dimension" />
+        <!-- Workaround to read user defined minimum width -->
+        <attr name="android:minWidth" />
+        <!-- Workaround to read user defined minimum height -->
+        <attr name="android:minHeight" />
+    </declare-styleable>
+
+    <declare-styleable name="UIComponentErrorStates">
+        <attr name="title" format="string" />
+        <attr name="description" format="string" />
+        <attr name="buttonLable" format="string" />
+        <attr name="errorIcon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="EqualizerView">
+        <attr name="barColor" format="color" />
+        <attr name="barGradient" format="reference" />
+        <attr name="barCount" format="integer" />
+        <attr name="barWidth" format="dimension" />
+        <attr name="marginLeft" format="dimension" />
+        <attr name="marginRight" format="dimension" />
+        <attr name="animationDuration" format="integer" />
+        <attr name="animationValueCount" format="integer" />
+        <attr name="runInBatterySaveMode" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="AutoScrollViewPagerV2">
+        <attr name="slideInterval" format="integer" />
+        <attr name="slideDirection" format="enum">
+            <enum name="left" value="0" />
+            <enum name="right" value="1" />
+        </attr>
+        <attr name="stopWhenTouch" format="boolean" />
+        <attr name="cycle" format="boolean" />
+        <attr name="slideDuration" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="ExpandableTextView">
+        <attr name="animation_duration" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="clap_fab">
+        <attr name="cf_max_clap_count" format="integer"/>
+        <attr name="cf_clap_count" format="integer"/>
+        <attr name="cf_format_clap_count" format="boolean"/>
+        <attr name="cf_default_icon" format="reference"/>
+        <attr name="cf_filled_icon" format="reference"/>
+        <attr name="cf_default_icon_color" format="reference"/>
+        <attr name="cf_filled_icon_color" format="reference"/>
+        <attr name="cf_count_circle_color" format="reference"/>
+        <attr name="cf_count_text_color" format="reference"/>
+        <attr name="cf_dots_1_color" format="reference"/>
+        <attr name="cf_dots_2_color" format="reference"/>
+        <attr name="cf_long_press_enabled" format="boolean"/>
+        <attr name="cf_long_press_clap_interval" format="integer"/>
+        <attr name="clap_gravity" format="string"/>
+    </declare-styleable>
+
+    <!-- Color Names -->
+    <attr name="textHeading" format="color"/>
+    <attr name="textSubHeading" format="color"/>
+    <attr name="textSearch" format="color"/>
+    <attr name="clickableTextattr" format="color"/>
+    <attr name="sideTextattr" format="color"/>
+
+    <attr name="seperator" format="color"/>
+    <attr name="seperator20Opaque" format="color"/>
+    <attr name="seperatorDarkLightSame" format="color"/>
+
+    <attr name="orange" format="color"/>
+    <attr name="common_bg" format="color"/>
+    <attr name="primaryStroke" format="color"/>
+    <attr name="redAlert" format="color"/>
+
+    <attr name="white" format="color"/>
+    <attr name="white60" format="color"/>
+    <attr name="black" format="color"/>
+    <attr name="black_alpha30" format="color"/>
+
+    <attr name="link" format="color"/>
+
+    <attr name="player_button_attr" format="color"/>
+
+    <!-- Background attr for light CardView. -->
+    <attr name="cardview_light_background" format="color"/>
+    <!-- Background attr for dark CardView. -->
+    <attr name="cardview_dark_background" format="color"/>
+    <!-- Shadow attr for the first pixels around CardView. -->
+    <attr name="cardview_shadow_start_attr" format="color"/>
+    <!-- Shadow attr for the furthest pixels around CardView. -->
+    <attr name="cardview_shadow_end_attr" format="color"/>
+
+    <attr name="waveform_selected" format="color"/>
+    <attr name="waveform_unselected" format="color"/>
+    <attr name="waveform_unselected_bkgnd_overlay" format="color"/>
+    <attr name="selection_border" format="color"/>
+    <attr name="playback_indicator" format="color"/>
+    <attr name="grid_line" format="color"/>
+    <attr name="timecode" format="color"/>
+    <attr name="timecode_shadow" format="color"/>
+
+    <!--For Clap-->
+    <attr name="attrClapIcon" format="color"/>
+    <attr name="dotsattr2" format="color"/>
+    <attr name="dotsattr1" format="color"/>
+    <attr name="bottomTopDivider" format="color"/>
+    <attr name="play_attr" format="color"/>
+
+    <attr name="bottom_nav_attr_checked" format="color"/>
+    <attr name="bottom_nav_attr_unchecked" format="color"/>
+    <attr name="bottom_nav_attr_background" format="color"/>
+    <attr name="account_separator" format="color"/>
+    <attr name="bottom_player_bg" format="color"/>
+    <attr name="tab_background_attr" format="color"/>
+
+    <attr name="selected_episode_bg_attr" format="color"/>
+    <attr name="seekbar_background" format="color"/>
+    <attr name="seekbar_background_secondary" format="color"/>
+
+    <attr name="seekbar_background_for_white" format="color"/>
+    <attr name="seekbar_background_secondary_for_white" format="color"/>
+    <attr name="input_title_hint" format="color"/>
+    <attr name="stats_bg_attr" format="color"/>
+    <attr name="only_white" format="color"/>
+
+    <attr name="clickableTextColor" format="color"/>
+    <attr name="sideTextColor" format="color"/>
+    <attr name="player_button_color" format="color"/>
+    <attr name="cardview_shadow_start_color" format="color"/>
+    <attr name="cardview_shadow_end_color" format="color"/>
+    <attr name="colorClapIcon" format="color"/>
+    <attr name="dotsColor2" format="color"/>
+    <attr name="dotsColor1" format="color"/>
+    <attr name="play_color" format="color"/>
+    <attr name="bottom_nav_color_checked" format="color"/>
+    <attr name="bottom_nav_color_unchecked" format="color"/>
+    <attr name="bottom_nav_color_background" format="color"/>
+    <attr name="tab_background_color" format="color"/>
+    <attr name="selected_episode_bg_color" format="color"/>
+    <attr name="stats_bg_color" format="color"/>
+    <attr name="themeButtonPrimaryColor" format="color"/>
+    <attr name="bottom_sheet_color" format="color"/>
+    <attr name="explode_bg" format="color"/>
+    <attr name="player_separator" format="color"/>
+    <attr name="place_holder_bg" format="color"/>
+    <attr name="place_holder_icon_color" format="color"/>
+    <attr name="continue_listening_bg" format="color"/>
+    <attr name="input_field_bg" format="color"/>
+    <attr name="outline_spot_shadow_color" format="color"/>
+    <attr name="card_stroke" format="color"/>
+    <attr name="follow_stroke" format="color"/>
+    <attr name="follow_solid" format="color"/>
+    <attr name="bottom_nav_selected_color" format="color"/>
+    <attr name="profile_tab_bg" format="color"/>
+    <attr name="profile_tab_icon_color" format="color"/>
+    <attr name="library_coach_mark_bg_color" format="color"/>
+    <attr name="see_all_text_color" format="color"/>
+    <attr name="see_all_card_stroke" format="color"/>
+
+</resources>

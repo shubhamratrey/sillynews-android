@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="cardview_light_background" tools:ignore="PrivateResource">#FFFFFFFF</color>
+    <color name="cardview_dark_background" tools:ignore="PrivateResource">#FF424242</color>
+    <color name="cardview_shadow_start_color" tools:ignore="PrivateResource">#1e8386a3</color>
+    <color name="cardview_shadow_end_color" tools:ignore="PrivateResource">#018386A3</color>
 </resources>

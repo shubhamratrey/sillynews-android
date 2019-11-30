@@ -154,12 +154,16 @@ class TaskFragment : BaseFragment() {
                     outRect.top = CommonUtil.dpToPx(20)
                     outRect.bottom = CommonUtil.dpToPx(20)
                 } else if (viewType == TaskAllAdapter.TASK) {
-                    outRect.top = CommonUtil.dpToPx(5)
-                    outRect.left = CommonUtil.dpToPx(20)
-                    outRect.right = CommonUtil.dpToPx(20)
-                    outRect.bottom = CommonUtil.dpToPx(5)
+//                    outRect.top = CommonUtil.dpToPx(5)
+                    outRect.left = CommonUtil.dpToPx(16)
+                    outRect.right = CommonUtil.dpToPx(16)
+//                    outRect.bottom = CommonUtil.dpToPx(5)
                 } else if (viewType == TaskAllAdapter.INFO) {
                     outRect.top = CommonUtil.dpToPx(20)
+                } else if (viewType == TaskAllAdapter.HEADER) {
+                    outRect.right = CommonUtil.dpToPx(20)
+                    outRect.left = CommonUtil.dpToPx(20)
+                    outRect.bottom = CommonUtil.dpToPx(10)
                 } else {
                     if (parent.getChildAdapterPosition(view) == parent.adapter!!.itemCount - 1) {
                         outRect.bottom = CommonUtil.dpToPx(20)

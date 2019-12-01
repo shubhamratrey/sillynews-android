@@ -1,12 +1,13 @@
 package com.sillylife.sillynews.services
 
+import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.models.responses.NewsDataResponse
+import com.sillylife.sillynews.models.responses.TaskResponse
 import com.sillylife.sillynews.models.responses.UserResponse
 import io.reactivex.Observable
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.QueryMap
+import retrofit2.http.*
 
 interface IAPIService {
 
@@ -21,5 +22,9 @@ interface IAPIService {
 
     @GET("${NetworkConstants.V1}/home/task")
     fun getTaskData(@QueryMap queryMap: Map<String, String>): Observable<Response<HomeDataResponse>>
+
+    @FormUrlEncoded
+    @POST("${NetworkConstants.V1}/home/{task_id}/update-task/")
+    fun updateTaskStatus(@Path("task_id") taskId: Int, @Field("status") status: String): Observable<Response<TaskResponse>>
 
 }

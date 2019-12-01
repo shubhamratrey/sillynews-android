@@ -16,6 +16,7 @@ import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.responses.HomeDataResponse
+import com.sillylife.sillynews.models.responses.TaskResponse
 import com.sillylife.sillynews.services.AppDisposable
 import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.NetworkConstants
@@ -81,6 +82,31 @@ class TaskFragment : BaseFragment() {
                 })
     }
 
+
+    @SuppressLint("CheckResult")
+    fun updateTaskStatus(taskId: Int, position: Int, status: String) {
+        SillyNews.getInstance().getAPIService()
+                .updateTaskStatus(taskId, status)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CallbackWrapper<Response<TaskResponse>>() {
+                    override fun onSuccess(t: Response<TaskResponse>) {
+                        if (t.body() != null) {
+//                            val s = t.body()?.rssItems!![2].title
+                            Log.d("updateTaskStatus", t.body()!!.task.status.toString())
+                            val adapter = rcvAll.adapter as TaskAllAdapter
+                            adapter.notifyItemChanged(position, t.body()?.task)
+//                            adapter.notifyItemChanged(position)
+                        }
+                    }
+
+                    override fun onFailure(code: Int, message: String) {
+
+                    }
+                })
+    }
+
+
     @SuppressLint("CheckResult")
     fun getScheduleData(pageNo: Int) {
         val hashMap = HashMap<String, String>()
@@ -125,8 +151,15 @@ class TaskFragment : BaseFragment() {
 //                            scrollBack.visibility = View.GONE
                         }
                     }
-                } else if(it is Task){
-                    Log.d(TAG, it.title + "  " + it.id)
+                } else if (it is Task) {
+                    if (type == "check") {
+                        val status = if (it.status.equals("completed")) {
+                            "pending"
+                        } else {
+                            "completed"
+                        }
+                        updateTaskStatus(it.id!!, position, status)
+                    }
                 }
             }
             if (rcvAll?.itemDecorationCount == 0) {

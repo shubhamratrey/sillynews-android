@@ -2,9 +2,12 @@ package com.sillylife.sillynews.views.adapter
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -94,6 +97,22 @@ class TaskAllAdapter(
         return commonItemLists.size
     }
 
+    override fun onBindViewHolder(holder: HomeAllViewPagerHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads != null && payloads.isNotEmpty()) {
+            for (any in payloads) {
+                if (any is Task) {
+                    if (commonItemLists[holder.adapterPosition] is Task) {
+                        val item = commonItemLists[holder.adapterPosition] as Task
+                        item.status = any.status
+                        setTask(holder)
+                    }
+                }
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
     override fun onBindViewHolder(holder: HomeAllViewPagerHolder, position: Int) {
         when (holder.itemViewType) {
             INFO -> {
@@ -120,6 +139,18 @@ class TaskAllAdapter(
         val item = commonItemLists[holder.adapterPosition] as Task?
         if (item != null) {
             holder.task_title.text = item.title
+            Log.d(TAG, "item status " +item.status)
+            if (item.status != null && item.status == "completed") {
+                holder.task_title.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+                holder.task_check.isChecked = true
+            } else {
+                holder.task_title.paintFlags = 0
+                holder.task_check.isChecked = false
+            }
+
+            holder.task_check.setOnClickListener {
+                listener(item, holder.adapterPosition, "check")
+            }
         }
     }
 
@@ -204,7 +235,7 @@ class TaskAllAdapter(
     inner class RecyclerItemTouchHelper(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            if (target.adapterPosition == 0 || target.adapterPosition == 1 || target.adapterPosition == 2){
+            if (target.adapterPosition == 0 || target.adapterPosition == 1 || target.adapterPosition == 2) {
                 return false
             }
             if (commonItemLists[viewHolder.adapterPosition] is Task) {

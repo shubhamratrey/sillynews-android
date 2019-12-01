@@ -1,6 +1,5 @@
 package com.sillylife.sillynews.services
 
-import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.models.responses.NewsDataResponse
 import com.sillylife.sillynews.models.responses.TaskResponse
@@ -25,6 +24,10 @@ interface IAPIService {
 
     @FormUrlEncoded
     @POST("${NetworkConstants.V1}/home/{task_id}/update-task/")
-    fun updateTaskStatus(@Path("task_id") taskId: Int, @Field("status") status: String): Observable<Response<TaskResponse>>
+    fun updateTask(@Path("task_id") taskId: Int,
+                         @Field("status") status: String,
+                         @Field("title") title: String,
+                         @Field("schedule_id") scheduleId: String
+    ): Observable<Response<TaskResponse>>
 
 }

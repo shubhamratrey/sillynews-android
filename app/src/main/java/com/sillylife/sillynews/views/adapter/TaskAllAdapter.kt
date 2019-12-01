@@ -3,11 +3,12 @@ package com.sillylife.sillynews.views.adapter
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +19,7 @@ import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.UserProfile
 import com.sillylife.sillynews.models.responses.HomeDataResponse
+import com.sillylife.sillynews.utils.CommonUtil
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_header.*
 import kotlinx.android.synthetic.main.item_home_brief.*
@@ -36,6 +38,8 @@ class TaskAllAdapter(
 
     val commonItemLists = ArrayList<Any>()
     var pageNo = 1
+    var tempTask: Task? = null
+    var tempPosition: Int? = null
 
     companion object {
         const val PROGRESS_VIEW = 0
@@ -121,6 +125,9 @@ class TaskAllAdapter(
     }
 
     override fun onBindViewHolder(holder: HomeAllViewPagerHolder, position: Int) {
+        if (position == -1){
+            return
+        }
         when (holder.itemViewType) {
             INFO -> {
                 setInfo(holder)
@@ -145,7 +152,7 @@ class TaskAllAdapter(
     private fun setTask(holder: HomeAllViewPagerHolder) {
         val item = commonItemLists[holder.adapterPosition] as Task?
         if (item != null) {
-            holder.task_title.text = item.title
+            holder.task_title.setText(item.title)
             if (item.status != null && item.status == Constants.TASK_COMPLETED) {
                 holder.task_title.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 holder.task_check.isChecked = true
@@ -157,7 +164,45 @@ class TaskAllAdapter(
             holder.task_check.setOnClickListener {
                 listener(item, holder.adapterPosition, Constants.TASK_CHECKBOX)
             }
+
+            holder.task_title.setOnClickListener {
+                holder.task_title.isCursorVisible = true
+            }
+
+            holder.task_title.setOnEditorActionListener { v, actionId, event ->
+                holder.task_title.isCursorVisible = false
+                if (event != null && event.keyCode == KEYCODE_ENTER) {
+                    CommonUtil.hideKeyboard(context)
+                }
+                false
+            }
+
+            holder.task_title.addTextChangedListener(object : TextWatcher {
+
+                override fun afterTextChanged(s: Editable) {}
+
+                override fun beforeTextChanged(s: CharSequence, start: Int,
+                                               count: Int, after: Int) {
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int,
+                                           before: Int, count: Int) {
+                    if (s.length != 0){
+                        tempTask = item
+                        tempTask?.title = s.toString()
+                        tempPosition = holder.adapterPosition
+                    }
+                }
+            })
         }
+    }
+
+    fun getTask(): Task?{
+        return tempTask
+    }
+
+    fun getTaskAdapterPosition():Int? {
+        return tempPosition
     }
 
     private fun setInfo(holder: HomeAllViewPagerHolder) {

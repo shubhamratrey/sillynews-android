@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sillylife.sillynews.R
@@ -41,7 +42,8 @@ class TaskFragment : BaseFragment() {
 
     private val TAG = TaskFragment::class.java.simpleName
     var appDisposable: AppDisposable = AppDisposable()
-    var mItemTouchHelper: ItemTouchHelper? = null
+    var tempTitle: String? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return LayoutInflater.from(context).inflate(R.layout.fragment_task, null, false)
     }
@@ -60,6 +62,27 @@ class TaskFragment : BaseFragment() {
             }
         })
 
+        view.viewTreeObserver.addOnGlobalLayoutListener {
+            val r = Rect()
+            view.getWindowVisibleDisplayFrame(r)
+            val heightDiff = view.rootView.height - (r.bottom - r.top)
+            if (heightDiff > 500) { // if more than 100 pixels, its probably a keyboard...
+                Log.d(TAG, "onViewCreated Keyboard Shown")
+            } else {
+                if (rcvAll?.adapter != null) {
+                    val adapter = rcvAll.adapter as TaskAllAdapter
+                    if (adapter.getTask() != null && adapter.getTaskAdapterPosition() != null){
+                        val task = adapter.getTask()!!
+                        if (tempTitle!= null && tempTitle.equals(adapter.getTask()?.title!!, true)){
+                            return@addOnGlobalLayoutListener
+                        }
+                        tempTitle = task.title
+                        updateTask(task.id!!, adapter.getTaskAdapterPosition()!!, "", task.title!!, "")
+                    }
+                    Log.d(TAG, "onViewCreated Keyboard Hide" + adapter.getTask()?.title+ "   " + adapter.getTaskAdapterPosition())
+                }
+            }
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -87,9 +110,9 @@ class TaskFragment : BaseFragment() {
 
 
     @SuppressLint("CheckResult")
-    fun updateTaskStatus(taskId: Int, position: Int, status: String) {
+    fun updateTask(taskId: Int, position: Int, status: String, title:String, scheduleId:String) {
         SillyNews.getInstance().getAPIService()
-                .updateTaskStatus(taskId, status)
+                .updateTask(taskId, status!!, title!!, scheduleId!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CallbackWrapper<Response<TaskResponse>>() {
@@ -97,7 +120,7 @@ class TaskFragment : BaseFragment() {
                         if (t.body() != null) {
 //                            val s = t.body()?.rssItems!![2].title
                             Log.d("updateTaskStatus", t.body()!!.task.status.toString())
-                            val adapter = rcvAll.adapter as TaskAllAdapter
+                            val adapter = rcvAll?.adapter as TaskAllAdapter
                             adapter.notifyItemChanged(position, t.body()?.task)
 //                            adapter.notifyItemChanged(position)
                         }
@@ -163,7 +186,7 @@ class TaskFragment : BaseFragment() {
                         } else {
                             Constants.TASK_COMPLETED
                         }
-                        updateTaskStatus(it.id!!, position, status)
+                        updateTask(it.id!!, position, status, "","")
                     }
                 } else if (it is Schedule) {
                     if (type == Constants.EDIT_SCHEDULE) {
@@ -183,6 +206,14 @@ class TaskFragment : BaseFragment() {
             if (itemTouchHelperCallback != null) {
                 ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rcvAll)
             }
+            rcvAll?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                        CommonUtil.hideKeyboard(context!!)
+                    }
+                }
+            })
         } else {
             val adapter = rcvAll.adapter as TaskAllAdapter
             adapter.addMoreData(response)

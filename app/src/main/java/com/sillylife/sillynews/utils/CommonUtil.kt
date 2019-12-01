@@ -4,11 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.DimenRes
 import com.sillylife.sillynews.SillyNews
 import java.io.File
 import java.io.IOException
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -87,5 +89,26 @@ object CommonUtil {
         }
 
         return app_installed
+    }
+
+
+    fun getTime(input: String): String? {
+        val serverFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm aaa")
+        val dateFormat = SimpleDateFormat("EEE, MMM d")
+        try {
+            val date = serverFormat.parse(input)
+            val d = dateFormat.format(date.time)
+            Log.d("CommonUtil", "getdate = $d")
+            val t = timeFormat.format(date.time)
+            Log.d("CommonUtil", "getime = $t")
+            return "$d, $t"
+        } catch (e: ParseException) {
+            e.printStackTrace()
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
+
+        return null
     }
 }

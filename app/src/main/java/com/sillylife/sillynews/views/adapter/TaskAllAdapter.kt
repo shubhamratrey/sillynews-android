@@ -55,12 +55,10 @@ class TaskAllAdapter(
         if (response.dataItems != null && response.dataItems!!.isNotEmpty()) {
             pageNo++
             response.dataItems!!.forEach {
-                if (it.type == USER_INFO) {
-                    commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES) {
-                    commonItemLists.add(it)
-                } else if (it.type == TASKS) {
-                    it.tasks.forEach { task ->
+                when {
+                    it.type == USER_INFO -> commonItemLists.add(it.userInfo!!)
+                    it.type == SCHEDULES -> commonItemLists.add(it)
+                    it.type == TASKS -> it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }
                 }
@@ -220,12 +218,10 @@ class TaskAllAdapter(
             this.response.dataItems!!.addAll(homeDataResponse.dataItems!!)
             this.response.hasMore = homeDataResponse.hasMore
             homeDataResponse.dataItems!!.forEach {
-                if (it.type == USER_INFO) {
-                    commonItemLists.add(it.userInfo!!)
-                } else if (it.type == SCHEDULES) {
-                    commonItemLists.add(it)
-                } else if (it.type == TASKS) {
-                    it.tasks.forEach { task ->
+                when {
+                    it.type == USER_INFO -> commonItemLists.add(it.userInfo!!)
+                    it.type == SCHEDULES -> commonItemLists.add(it)
+                    it.type == TASKS -> it.tasks.forEach { task ->
                         commonItemLists.add(task)
                     }
                 }
@@ -249,7 +245,7 @@ class TaskAllAdapter(
             if (commonItemLists[viewHolder.adapterPosition] is Task) {
                 val task = commonItemLists[viewHolder.adapterPosition] as Task
                 Collections.swap(commonItemLists, viewHolder.adapterPosition, target.adapterPosition);
-                notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition);
+                notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
             return false
@@ -296,7 +292,7 @@ class TaskAllAdapter(
         override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                 try {
-                    var width = viewHolder.itemView.width
+                    val width = viewHolder.itemView.width
                     val alpha = 1.0f - abs(dX) / width.toFloat()
                     viewHolder.itemView.alpha = alpha
                     viewHolder.itemView.translationX = dX

@@ -11,6 +11,7 @@ import com.sillylife.sillynews.R
 import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.Schedule
+import com.sillylife.sillynews.utils.CommonUtil
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_schedule.*
 import java.util.*
@@ -85,6 +86,7 @@ class SchedulesAdapter(
         val rnd = Random()
         val currentColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         holder.rootLayout.setCardBackgroundColor(currentColor)
+        holder.editLayout.visibility = View.GONE
         holder.containerView.setOnLongClickListener {
             if (holder.editLayout.visibility == View.VISIBLE) {
                 holder.editLayout.visibility = View.GONE

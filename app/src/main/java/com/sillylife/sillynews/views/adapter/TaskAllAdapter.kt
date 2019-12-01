@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
+import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.UserProfile
@@ -106,6 +107,14 @@ class TaskAllAdapter(
                         item.status = any.status
                         setTask(holder)
                     }
+                } else if (any is HomeDataItem) {
+                    if (commonItemLists[holder.adapterPosition] is HomeDataItem) {
+                        val item = commonItemLists[holder.adapterPosition] as HomeDataItem
+                        item.schedules = any.schedules
+                        item.hasMore = any.hasMore
+                        val adapter = holder.commonRcv.adapter as SchedulesAdapter
+                        adapter.addMoreData(item)
+                    }
                 }
             }
         } else {
@@ -130,7 +139,7 @@ class TaskAllAdapter(
         }
         if (holder.adapterPosition == itemCount - 1) {
             if (response.hasMore != null && response.hasMore!!) {
-                listener(pageNo, -1, "task")
+                listener(pageNo, -1, Constants.TASK_PAGINATE)
             }
         }
     }
@@ -139,8 +148,7 @@ class TaskAllAdapter(
         val item = commonItemLists[holder.adapterPosition] as Task?
         if (item != null) {
             holder.task_title.text = item.title
-            Log.d(TAG, "item status " +item.status)
-            if (item.status != null && item.status == "completed") {
+            if (item.status != null && item.status == Constants.TASK_COMPLETED) {
                 holder.task_title.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
                 holder.task_check.isChecked = true
             } else {
@@ -149,7 +157,7 @@ class TaskAllAdapter(
             }
 
             holder.task_check.setOnClickListener {
-                listener(item, holder.adapterPosition, "check")
+                listener(item, holder.adapterPosition, Constants.TASK_CHECKBOX)
             }
         }
     }
@@ -170,12 +178,12 @@ class TaskAllAdapter(
                 val resource = context.resources
                 val startMargin = resource.getDimensionPixelSize(R.dimen.dp_20)
                 val endMargin = resource.getDimensionPixelSize(R.dimen.dp_20)
-                val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_5)
+                val betweenMargin = resource.getDimensionPixelSize(R.dimen.dp_10)
                 holder.commonRcv.addItemDecoration(SchedulesAdapter.ItemDecoration(startMargin, betweenMargin, endMargin))
             }
             holder.commonRcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            schedulesAdapter = SchedulesAdapter(context, homeDataItem) { it, position ->
-                listener(it, position, "schedule")
+            schedulesAdapter = SchedulesAdapter(context, homeDataItem) { it, position, type ->
+                listener(it, holder.adapterPosition, type)
             }
             //adapter.setHasStableIds(true)
             holder.commonRcv.setHasFixedSize(true)

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sillylife.sillynews.R
+import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.models.HomeDataItem
 import com.sillylife.sillynews.models.Schedule
 import kotlinx.android.extensions.LayoutContainer
@@ -17,9 +18,9 @@ import kotlin.collections.ArrayList
 
 
 class SchedulesAdapter(
-    val context: Context,
-    private val response: HomeDataItem,
-    val listener: (Any, Int) -> Unit
+        val context: Context,
+        private val response: HomeDataItem,
+        val listener: (Any, Int, String) -> Unit
 ) : RecyclerView.Adapter<SchedulesAdapter.Holder>() {
 
     val commonItemLists = ArrayList<Any>()
@@ -54,11 +55,7 @@ class SchedulesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = when (viewType) {
-            SCHEDULE -> LayoutInflater.from(context).inflate(
-                R.layout.item_schedule,
-                parent,
-                false
-            )
+            SCHEDULE -> LayoutInflater.from(context).inflate(R.layout.item_schedule, parent, false)
             else -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
         }
         return Holder(view)
@@ -76,7 +73,7 @@ class SchedulesAdapter(
         }
         if (holder.adapterPosition == itemCount - 1) {
             if (response.hasMore != null && response.hasMore!!) {
-                listener(pageNo, -1)
+                listener(pageNo, -1, Constants.SCHEDULE_PAGINATE)
             }
         }
     }
@@ -88,7 +85,32 @@ class SchedulesAdapter(
         val rnd = Random()
         val currentColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         holder.rootLayout.setCardBackgroundColor(currentColor)
+        holder.containerView.setOnLongClickListener {
+            if (holder.editLayout.visibility == View.VISIBLE) {
+                holder.editLayout.visibility = View.GONE
+            } else {
+                holder.editLayout.visibility = View.VISIBLE
+            }
+            true
+        }
 
+        holder.containerView.setOnClickListener {
+            if (holder.editLayout.visibility == View.VISIBLE) {
+                holder.editLayout.visibility = View.GONE
+            }
+        }
+
+        holder.editSchedule.setOnClickListener {
+            listener(item, holder.adapterPosition, Constants.EDIT_SCHEDULE)
+            if (holder.editLayout.visibility == View.VISIBLE) {
+                holder.editLayout.visibility = View.GONE
+            }
+        }
+
+        holder.deleteSchedule.setOnClickListener {
+            listener(item, holder.adapterPosition, Constants.DELETE_SCHEDULE)
+            notifyItemRemoved(holder.adapterPosition)
+        }
     }
 
     fun addMoreData(response: HomeDataItem) {
@@ -111,16 +133,16 @@ class SchedulesAdapter(
     }
 
     class Holder(override val containerView: View) :
-        RecyclerView.ViewHolder(containerView),
-        LayoutContainer
+            RecyclerView.ViewHolder(containerView),
+            LayoutContainer
 
     class ItemDecoration(val startMargin: Int, val betweenMargin: Int, val endMargin: Int) :
-        RecyclerView.ItemDecoration() {
+            RecyclerView.ItemDecoration() {
         override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
         ) {
             val position = parent.getChildAdapterPosition(view)
             val adapter = parent.adapter as SchedulesAdapter

@@ -10,10 +10,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.sillylife.sillynews.R
 import com.sillylife.sillynews.SillyNews
+import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
+import com.sillylife.sillynews.models.Schedule
 import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.models.responses.TaskResponse
@@ -108,7 +111,7 @@ class TaskFragment : BaseFragment() {
 
 
     @SuppressLint("CheckResult")
-    fun getScheduleData(pageNo: Int) {
+    fun getScheduleData(pageNo: Int, position: Int) {
         val hashMap = HashMap<String, String>()
         hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
         hashMap[NetworkConstants.API_PATH_QUERY_TYPE] = "schedules"
@@ -119,11 +122,13 @@ class TaskFragment : BaseFragment() {
                 .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
                     override fun onSuccess(t: Response<HomeDataResponse>) {
                         if (t.body() != null) {
-//                            val s = t.body()?.rssItems!![2].title
                             Log.d("getTaskData", t.body().toString())
-//                        setHomeAdapter(t.body()!!)
                             val adapter = rcvAll.adapter as TaskAllAdapter
-                            adapter.addMoreScheduleData(t.body()!!)
+                            t.body()?.dataItems!!.forEach {
+                                if (it.type == TaskAllAdapter.SCHEDULES) {
+                                    adapter.notifyItemChanged(position, it)
+                                }
+                            }
                         }
                     }
 
@@ -139,9 +144,9 @@ class TaskFragment : BaseFragment() {
             val adapter = TaskAllAdapter(context!!, response) { it, position, type ->
                 if (it is Int) {
                     if (it > 0) {
-                        if (type == "schedule") {
-                            getScheduleData(it)
-                        } else {
+                        if (type == Constants.SCHEDULE_PAGINATE) {
+                            getScheduleData(it, position)
+                        } else if (type == Constants.TASK_PAGINATE) {
                             getHomeData(it)
                         }
                     } else {
@@ -152,13 +157,19 @@ class TaskFragment : BaseFragment() {
                         }
                     }
                 } else if (it is Task) {
-                    if (type == "check") {
-                        val status = if (it.status.equals("completed")) {
-                            "pending"
+                    if (type == Constants.TASK_CHECKBOX) {
+                        val status = if (it.status.equals(Constants.TASK_COMPLETED)) {
+                            Constants.TASK_PENDING
                         } else {
-                            "completed"
+                            Constants.TASK_COMPLETED
                         }
                         updateTaskStatus(it.id!!, position, status)
+                    }
+                } else if (it is Schedule) {
+                    if (type == Constants.EDIT_SCHEDULE) {
+                        Log.d(TAG, "editttt" + it.title)
+                    } else if (type == Constants.DELETE_SCHEDULE) {
+                        Snackbar.make(rcvAll, "" + it.title + " deleted", Snackbar.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -197,6 +208,7 @@ class TaskFragment : BaseFragment() {
                     outRect.right = CommonUtil.dpToPx(20)
                     outRect.left = CommonUtil.dpToPx(20)
                     outRect.bottom = CommonUtil.dpToPx(10)
+                    outRect.top = CommonUtil.dpToPx(10)
                 } else {
                     if (parent.getChildAdapterPosition(view) == parent.adapter!!.itemCount - 1) {
                         outRect.bottom = CommonUtil.dpToPx(20)
@@ -205,7 +217,6 @@ class TaskFragment : BaseFragment() {
             }
         }
     }
-
 
     override fun onResume() {
         super.onResume()

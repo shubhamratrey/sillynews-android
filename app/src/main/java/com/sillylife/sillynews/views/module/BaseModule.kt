@@ -4,8 +4,8 @@ import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.services.AppDisposable
 
 open class BaseModule {
-    val mKukuFMApplication = SillyNews.getInstance()
-    val apiService = mKukuFMApplication.getAPIService()
+    val application = SillyNews.getInstance()
+    val apiService = application.getAPIService()
     var appDisposable = AppDisposable()
 
     fun onDestroy() {

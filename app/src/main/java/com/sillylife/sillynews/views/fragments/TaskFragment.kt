@@ -1,6 +1,5 @@
 package com.sillylife.sillynews.views.fragments
 
-import android.annotation.SuppressLint
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -8,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sillylife.sillynews.R
-import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.constants.Constants
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
@@ -21,20 +20,44 @@ import com.sillylife.sillynews.models.Task
 import com.sillylife.sillynews.models.responses.HomeDataResponse
 import com.sillylife.sillynews.models.responses.TaskResponse
 import com.sillylife.sillynews.services.AppDisposable
-import com.sillylife.sillynews.services.CallbackWrapper
-import com.sillylife.sillynews.services.NetworkConstants
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.FragmentHelper
 import com.sillylife.sillynews.views.activity.MainActivity
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import com.sillylife.sillynews.views.adapter.TaskAllAdapter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.sillylife.sillynews.views.module.HomeFragmentModule
+import com.sillylife.sillynews.views.viewmodal.HomeFragmentViewModel
+import com.sillylife.sillynews.views.viewmodelfactory.FragmentViewModelFactory
 import kotlinx.android.synthetic.main.fragment_news.*
-import retrofit2.Response
-import java.util.*
 
-class TaskFragment : BaseFragment() {
+class TaskFragment : BaseFragment(), HomeFragmentModule.IModuleListener {
+    override fun onApiFailure(statusCode: Int, message: String) {
+
+    }
+
+    override fun onHomeApiSuccess(response: HomeDataResponse?) {
+        if (response != null) {
+            setHomeAdapter(response)
+        }
+    }
+
+    override fun onTaskUpdateApiSuccess(response: TaskResponse?, position: Int) {
+        if (response?.task != null) {
+            val adapter = rcvAll?.adapter as TaskAllAdapter
+            adapter.notifyItemChanged(position, response.task)
+        }
+    }
+
+    override fun onSchedulesApiSuccess(response: HomeDataResponse?, position: Int) {
+        if (response != null) {
+            val adapter = rcvAll.adapter as TaskAllAdapter
+            response.dataItems!!.forEach {
+                if (it.type == TaskAllAdapter.SCHEDULES) {
+                    adapter.notifyItemChanged(position, it)
+                }
+            }
+        }
+    }
 
     companion object {
         fun newInstance() = TaskFragment()
@@ -42,6 +65,7 @@ class TaskFragment : BaseFragment() {
 
     private val TAG = TaskFragment::class.java.simpleName
     var appDisposable: AppDisposable = AppDisposable()
+    private var viewModel: HomeFragmentViewModel? = null
     var tempTitle: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,12 +74,14 @@ class TaskFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProviders.of(this, FragmentViewModelFactory(this@TaskFragment))
+                .get(HomeFragmentViewModel::class.java)
 
         appDisposable.add(RxBus.listen(RxEvent.NetworkConnectivity::class.java).subscribe { action ->
             Log.d("onNetworkConnection 2", action.isConnected.toString())
             if (action.isConnected) {
                 if (rcvAll?.adapter == null) {
-                    getHomeData(1)
+                    viewModel?.getHomeData(1)
                 }
             } else {
                 Toast.makeText(context, "Make sure you have working internet connection", Toast.LENGTH_SHORT).show()
@@ -85,91 +111,14 @@ class TaskFragment : BaseFragment() {
 //        }
     }
 
-    @SuppressLint("CheckResult")
-    fun getHomeData(pageNo: Int) {
-        val hashMap = HashMap<String, String>()
-        hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
-        SillyNews.getInstance().getAPIService()
-                .getTaskData(hashMap)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
-                    override fun onSuccess(t: Response<HomeDataResponse>) {
-                        if (t.body() != null) {
-//                            val s = t.body()?.rssItems!![2].title
-                            Log.d("getTaskData", t.body().toString())
-                            setHomeAdapter(t.body()!!)
-                        }
-                    }
-
-                    override fun onFailure(code: Int, message: String) {
-
-                    }
-                })
-    }
-
-
-    @SuppressLint("CheckResult")
-    fun updateTask(taskId: Int, position: Int, status: String, title: String, scheduleId: String) {
-        SillyNews.getInstance().getAPIService()
-                .updateTask(taskId, status!!, title!!, scheduleId!!)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<TaskResponse>>() {
-                    override fun onSuccess(t: Response<TaskResponse>) {
-                        if (t.body() != null) {
-//                            val s = t.body()?.rssItems!![2].title
-                            Log.d("updateTaskStatus", t.body()!!.task.status.toString())
-                            val adapter = rcvAll?.adapter as TaskAllAdapter
-                            adapter.notifyItemChanged(position, t.body()?.task)
-//                            adapter.notifyItemChanged(position)
-                        }
-                    }
-
-                    override fun onFailure(code: Int, message: String) {
-
-                    }
-                })
-    }
-
-
-    @SuppressLint("CheckResult")
-    fun getScheduleData(pageNo: Int, position: Int) {
-        val hashMap = HashMap<String, String>()
-        hashMap[NetworkConstants.API_PATH_QUERY_PAGE] = pageNo.toString()
-        hashMap[NetworkConstants.API_PATH_QUERY_TYPE] = "schedules"
-        SillyNews.getInstance().getAPIService()
-                .getTaskData(hashMap)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<HomeDataResponse>>() {
-                    override fun onSuccess(t: Response<HomeDataResponse>) {
-                        if (t.body() != null) {
-                            Log.d("getTaskData", t.body().toString())
-                            val adapter = rcvAll.adapter as TaskAllAdapter
-                            t.body()?.dataItems!!.forEach {
-                                if (it.type == TaskAllAdapter.SCHEDULES) {
-                                    adapter.notifyItemChanged(position, it)
-                                }
-                            }
-                        }
-                    }
-
-                    override fun onFailure(code: Int, message: String) {
-
-                    }
-                })
-    }
-
-
     private fun setHomeAdapter(response: HomeDataResponse) {
         if (rcvAll?.adapter == null) {
             val adapter = TaskAllAdapter(context!!, response) { it, position, type ->
                 if (it is Int) {
                     if (it > 0) {
                         when (type) {
-                            Constants.SCHEDULE_PAGINATE -> getScheduleData(it, position)
-                            Constants.TASK_PAGINATE -> getHomeData(it)
+                            Constants.SCHEDULE_PAGINATE -> viewModel?.getScheduleData(it, position)
+                            Constants.TASK_PAGINATE -> viewModel?.getHomeData(it)
                             Constants.ADD_SCHEDULE -> (activity as MainActivity).addFragment(AddScheduleFragment.newInstance(), FragmentHelper.HOME_TO_ADD_SCHEDULE)
                         }
                     }
@@ -180,7 +129,7 @@ class TaskFragment : BaseFragment() {
                         } else {
                             Constants.TASK_COMPLETED
                         }
-                        updateTask(it.id!!, position, status, "", "")
+                        viewModel?.updateTask(it.id!!, position, status, "", "")
                     }
                 } else if (it is Schedule) {
                     when (type) {
@@ -243,12 +192,9 @@ class TaskFragment : BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         appDisposable.dispose()
+        viewModel?.onDestroy()
     }
 }

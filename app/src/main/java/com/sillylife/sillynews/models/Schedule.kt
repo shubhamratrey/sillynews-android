@@ -9,7 +9,8 @@ data class Schedule(
     var title: String?,
     var start_time: String?,
     var end_time: String?,
-    val icon_url: Int?,
+    var status: String?,
+    val icon_url: String?,
     val slug: String?,
     val day: String?
 ) : Parcelable

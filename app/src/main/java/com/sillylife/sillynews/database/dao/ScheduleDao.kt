@@ -9,7 +9,7 @@ import com.sillylife.sillynews.database.entities.ScheduleEntity
 interface ScheduleDao : BaseDao<ScheduleEntity> {
 
     @Query("SELECT * FROM schedule WHERE id = :id")
-    fun getContentUnit(id: Int): ScheduleEntity
+    fun getContentUnitById(id: Int): ScheduleEntity
 
 //    @Query("SELECT * FROM content_unit WHERE parts_downloaded > 0 or is_downloaded_all = 1")
 //    fun getCUWithMoreThanZeroPartDownloaded(): LiveData<List<ContentUnitEntity>>

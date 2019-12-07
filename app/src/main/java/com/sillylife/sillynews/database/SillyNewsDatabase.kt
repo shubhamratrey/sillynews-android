@@ -16,7 +16,6 @@ import com.sillylife.sillynews.database.entities.TaskEntity
 @Database(entities = [TaskEntity::class, ScheduleEntity::class], version = 1, exportSchema = false)
 abstract class SillyNewsDatabase : RoomDatabase() {
 
-//    abstract fun mixedItemDataDao(): MixedItemDataDao
     abstract fun scheduleDao(): ScheduleDao
     abstract fun taskDao(): TaskDao
 

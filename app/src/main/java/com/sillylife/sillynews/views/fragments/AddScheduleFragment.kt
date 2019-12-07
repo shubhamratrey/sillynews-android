@@ -1,6 +1,5 @@
 package com.sillylife.sillynews.views.fragments
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,7 +14,6 @@ class AddScheduleFragment : Fragment() {
         fun newInstance() = AddScheduleFragment()
     }
 
-    private lateinit var viewModel: AddScheduleViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -24,8 +22,6 @@ class AddScheduleFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(AddScheduleViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
 }

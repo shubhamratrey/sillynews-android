@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import com.facebook.stetho.Stetho
+import com.sillylife.sillynews.database.SillyNewsDatabase
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.services.*
@@ -31,7 +32,7 @@ class SillyNews : Application(), ConnectivityReceiverListener {
     @Volatile
     private var mIAPIService: IAPIService? = null
     @Volatile
-    private var mIAPIServiceCache: IAPIService? = null
+    private var mDatabase: SillyNewsDatabase? = null
 
     private var connectivityReceiver: ConnectivityReceiver? = null
 
@@ -67,11 +68,12 @@ class SillyNews : Application(), ConnectivityReceiverListener {
     }
 
     @Synchronized
-    fun getAPIService(cacheEnabled: Boolean): IAPIService {
-        if (mIAPIService == null) {
-            mIAPIService = APIService.build()
+    fun getDatabase(): SillyNewsDatabase? {
+        if (mDatabase == null) {
+            mDatabase = SillyNewsDatabase.getInstance(this)
         }
-        return if (cacheEnabled) mIAPIServiceCache!! else mIAPIService!!
+        return mDatabase
     }
+
 
 }

@@ -64,11 +64,11 @@ class MainActivity : BaseActivity(), MainActivityModule.IModuleListener {
                         "onActivityResult",
                         "using FirebaseAuthUserManager ${FirebaseAuthUserManager.getFirebaseAuthToken()}"
                 )
-                viewModel?.getMe()
                 FirebaseAuth.getInstance().currentUser?.getIdToken(true)
                         ?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 Log.d("onActivityResult", task.result!!.token!!)
+                                viewModel?.getMe()
                             }
                         }
                 // ...

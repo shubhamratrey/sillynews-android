@@ -11,8 +11,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.sillylife.sillynews.R
+import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.constants.Constants
+import com.sillylife.sillynews.database.MapDbEntities
+import com.sillylife.sillynews.database.dao.ScheduleDao
+import com.sillylife.sillynews.database.entities.ScheduleEntity
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.models.Schedule
@@ -25,6 +30,7 @@ import com.sillylife.sillynews.utils.FragmentHelper
 import com.sillylife.sillynews.views.activity.MainActivity
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import com.sillylife.sillynews.views.adapter.TaskAllAdapter
+import com.sillylife.sillynews.views.adapter.TaskAllAdapter.Companion.SCHEDULES
 import com.sillylife.sillynews.views.module.HomeFragmentModule
 import com.sillylife.sillynews.views.viewmodal.HomeFragmentViewModel
 import com.sillylife.sillynews.views.viewmodelfactory.FragmentViewModelFactory
@@ -52,8 +58,10 @@ class TaskFragment : BaseFragment(), HomeFragmentModule.IModuleListener {
         if (response != null) {
             val adapter = rcvAll.adapter as TaskAllAdapter
             response.dataItems!!.forEach {
-                if (it.type == TaskAllAdapter.SCHEDULES) {
-                    adapter.notifyItemChanged(position, it)
+                when (SCHEDULES) {
+                    it.type -> {
+                        adapter.notifyItemChanged(position, it)
+                    }
                 }
             }
         }

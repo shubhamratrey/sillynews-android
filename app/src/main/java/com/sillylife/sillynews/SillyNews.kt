@@ -3,6 +3,7 @@ package com.sillylife.sillynews
 import android.app.Application
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import com.facebook.stetho.Stetho
 import com.sillylife.sillynews.events.RxBus
 import com.sillylife.sillynews.events.RxEvent
 import com.sillylife.sillynews.services.*
@@ -49,6 +50,7 @@ class SillyNews : Application(), ConnectivityReceiverListener {
     override fun onCreate() {
         super.onCreate()
         sillyNewsApplication = this@SillyNews
+        Stetho.initializeWithDefaults(this)
 
         val intentFilter = IntentFilter()
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)

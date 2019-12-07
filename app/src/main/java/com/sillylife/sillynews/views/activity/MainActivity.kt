@@ -1,4 +1,4 @@
-package com.sillylife.sillynews.views
+package com.sillylife.sillynews.views.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -6,76 +6,51 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.sillylife.sillynews.R
-import com.sillylife.sillynews.SillyNews
 import com.sillylife.sillynews.models.responses.UserResponse
-import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.FirebaseAuthUserManager
+import com.sillylife.sillynews.services.sharedpreference.SharedPreferenceManager
 import com.sillylife.sillynews.utils.FragmentHelper
-import com.sillylife.sillynews.views.fragments.HomeFragment
 import com.sillylife.sillynews.views.fragments.TaskFragment
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import retrofit2.Response
+import com.sillylife.sillynews.views.module.MainActivityModule
+import com.sillylife.sillynews.views.viewmodal.MainActivityViewModel
+import com.sillylife.sillynews.views.viewmodelfactory.ActivityViewModelFactory
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity(), MainActivityModule.IModuleListener {
+    override fun onGetMeApiSuccess(response: UserResponse) {
+        if (!isFinishing) {
+            FragmentHelper.replace(R.id.container, supportFragmentManager, TaskFragment.newInstance(), FragmentHelper.HOME)
+        }
+    }
 
-    var homeFragment: HomeFragment? = null
-    var taskFragment: TaskFragment? = null
+    override fun onGetMeApiFailure(statusCode: Int, message: String) {
+    }
+
     val RC_SIGN_IN = 12132
     private val TAG = MainActivity::class.java.simpleName
+    private var viewModel: MainActivityViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        viewModel = ViewModelProviders.of(this, ActivityViewModelFactory(this)).get(MainActivityViewModel::class.java)
         if (!FirebaseAuthUserManager.isUserLoggedIn()) {
-            val providers = arrayListOf(
-                AuthUI.IdpConfig.PhoneBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build()
-            )
-
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .build(),
-                RC_SIGN_IN
-            )
+            val providers = arrayListOf(AuthUI.IdpConfig.PhoneBuilder().build(), AuthUI.IdpConfig.GoogleBuilder().build())
+            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build(), RC_SIGN_IN)
         } else {
-            getUser()
+            if (SharedPreferenceManager.getUser() != null) {
+                FragmentHelper.replace(R.id.container, supportFragmentManager, TaskFragment.newInstance(), FragmentHelper.HOME)
+            } else {
+                viewModel?.getMe()
+            }
         }
-        homeFragment = HomeFragment.newInstance()
-        taskFragment = TaskFragment.newInstance()
-        FragmentHelper.replace(R.id.container, supportFragmentManager, taskFragment!!, FragmentHelper.HOME)
     }
-
-    fun getUser(){
-        SillyNews.getInstance().appDisposable.add(
-            SillyNews.getInstance().getAPIService()
-                .getMe()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CallbackWrapper<Response<UserResponse>>() {
-                    override fun onSuccess(t: Response<UserResponse>) {
-                        if (t.isSuccessful) {
-                            Log.d(TAG, t.toString())
-                            FragmentHelper.replace(R.id.container, supportFragmentManager, taskFragment!!, FragmentHelper.HOME)
-                        }
-                    }
-
-                    override fun onFailure(code: Int, message: String) {
-
-                    }
-                })
-        )
-    }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -86,16 +61,16 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
                 Log.d(
-                    "onActivityResult",
-                    "using FirebaseAuthUserManager ${FirebaseAuthUserManager.getFirebaseAuthToken()}"
+                        "onActivityResult",
+                        "using FirebaseAuthUserManager ${FirebaseAuthUserManager.getFirebaseAuthToken()}"
                 )
-                getUser()
+                viewModel?.getMe()
                 FirebaseAuth.getInstance().currentUser?.getIdToken(true)
-                    ?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("onActivityResult", task.result!!.token!!)
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("onActivityResult", task.result!!.token!!)
+                            }
                         }
-                    }
                 // ...
             } else {
                 // Sign in failed. If response is null the user canceled the
@@ -126,6 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel?.onDestroy()
     }
 
     fun addFragment(fragment: Fragment, tag: String) {

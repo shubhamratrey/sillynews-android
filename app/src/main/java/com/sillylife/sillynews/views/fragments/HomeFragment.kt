@@ -19,7 +19,7 @@ import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.NetworkConstants
 import com.sillylife.sillynews.utils.CommonUtil
 import com.sillylife.sillynews.utils.FragmentHelper
-import com.sillylife.sillynews.views.MainActivity
+import com.sillylife.sillynews.views.activity.MainActivity
 import com.sillylife.sillynews.views.adapter.HomeAllAdapter
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers

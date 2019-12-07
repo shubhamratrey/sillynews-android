@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sillylife.sillynews.R
@@ -25,7 +24,8 @@ import com.sillylife.sillynews.services.AppDisposable
 import com.sillylife.sillynews.services.CallbackWrapper
 import com.sillylife.sillynews.services.NetworkConstants
 import com.sillylife.sillynews.utils.CommonUtil
-import com.sillylife.sillynews.views.adapter.HomeAllAdapter
+import com.sillylife.sillynews.utils.FragmentHelper
+import com.sillylife.sillynews.views.activity.MainActivity
 import com.sillylife.sillynews.views.adapter.NewsAllAdapter
 import com.sillylife.sillynews.views.adapter.TaskAllAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,27 +62,27 @@ class TaskFragment : BaseFragment() {
             }
         })
 
-        view.viewTreeObserver.addOnGlobalLayoutListener {
-            val r = Rect()
-            view.getWindowVisibleDisplayFrame(r)
-            val heightDiff = view.rootView.height - (r.bottom - r.top)
-            if (heightDiff > 500) { // if more than 100 pixels, its probably a keyboard...
-                Log.d(TAG, "onViewCreated Keyboard Shown")
-            } else {
-                if (rcvAll?.adapter != null) {
-                    val adapter = rcvAll.adapter as TaskAllAdapter
-                    if (adapter.getTask() != null && adapter.getTaskAdapterPosition() != null){
-                        val task = adapter.getTask()!!
-                        if (tempTitle!= null && tempTitle.equals(adapter.getTask()?.title!!, true)){
-                            return@addOnGlobalLayoutListener
-                        }
-                        tempTitle = task.title
-                        updateTask(task.id!!, adapter.getTaskAdapterPosition()!!, "", task.title!!, "")
-                    }
-                    Log.d(TAG, "onViewCreated Keyboard Hide" + adapter.getTask()?.title+ "   " + adapter.getTaskAdapterPosition())
-                }
-            }
-        }
+//        view.viewTreeObserver.addOnGlobalLayoutListener {
+//            val r = Rect()
+//            view.getWindowVisibleDisplayFrame(r)
+//            val heightDiff = view.rootView.height - (r.bottom - r.top)
+//            if (heightDiff > 500) { // if more than 100 pixels, its probably a keyboard...
+//                Log.d(TAG, "onViewCreated Keyboard Shown")
+//            } else {
+//                if (rcvAll?.adapter != null) {
+//                    val adapter = rcvAll.adapter as TaskAllAdapter
+//                    if (adapter.getTask() != null && adapter.getTaskAdapterPosition() != null){
+//                        val task = adapter.getTask()!!
+//                        if (tempTitle!= null && tempTitle.equals(adapter.getTask()?.title!!, true)){
+//                            return@addOnGlobalLayoutListener
+//                        }
+//                        tempTitle = task.title
+//                        updateTask(task.id!!, adapter.getTaskAdapterPosition()!!, "", task.title!!, "")
+//                    }
+//                    Log.d(TAG, "onViewCreated Keyboard Hide" + adapter.getTask()?.title+ "   " + adapter.getTaskAdapterPosition())
+//                }
+//            }
+//        }
     }
 
     @SuppressLint("CheckResult")
@@ -110,7 +110,7 @@ class TaskFragment : BaseFragment() {
 
 
     @SuppressLint("CheckResult")
-    fun updateTask(taskId: Int, position: Int, status: String, title:String, scheduleId:String) {
+    fun updateTask(taskId: Int, position: Int, status: String, title: String, scheduleId: String) {
         SillyNews.getInstance().getAPIService()
                 .updateTask(taskId, status!!, title!!, scheduleId!!)
                 .subscribeOn(Schedulers.io())
@@ -167,16 +167,10 @@ class TaskFragment : BaseFragment() {
             val adapter = TaskAllAdapter(context!!, response) { it, position, type ->
                 if (it is Int) {
                     if (it > 0) {
-                        if (type == Constants.SCHEDULE_PAGINATE) {
-                            getScheduleData(it, position)
-                        } else if (type == Constants.TASK_PAGINATE) {
-                            getHomeData(it)
-                        }
-                    } else {
-                        if (it == HomeAllAdapter.SCROLLBACK_SHOW_ID) {
-//                            scrollBack.visibility = View.VISIBLE
-                        } else if (it == HomeAllAdapter.SCROLLBACK_HIDE_ID) {
-//                            scrollBack.visibility = View.GONE
+                        when (type) {
+                            Constants.SCHEDULE_PAGINATE -> getScheduleData(it, position)
+                            Constants.TASK_PAGINATE -> getHomeData(it)
+                            Constants.ADD_SCHEDULE -> (activity as MainActivity).addFragment(AddScheduleFragment.newInstance(), FragmentHelper.HOME_TO_ADD_SCHEDULE)
                         }
                     }
                 } else if (it is Task) {
@@ -186,13 +180,12 @@ class TaskFragment : BaseFragment() {
                         } else {
                             Constants.TASK_COMPLETED
                         }
-                        updateTask(it.id!!, position, status, "","")
+                        updateTask(it.id!!, position, status, "", "")
                     }
                 } else if (it is Schedule) {
-                    if (type == Constants.EDIT_SCHEDULE) {
-                        Log.d(TAG, "editttt" + it.title)
-                    } else if (type == Constants.DELETE_SCHEDULE) {
-                        Snackbar.make(rcvAll, "" + it.title + " deleted", Snackbar.LENGTH_SHORT).show()
+                    when (type) {
+                        Constants.EDIT_SCHEDULE -> Log.d(TAG, "editttt" + it.title)
+                        Constants.DELETE_SCHEDULE -> Snackbar.make(rcvAll, "" + it.title + " deleted", Snackbar.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -200,7 +193,8 @@ class TaskFragment : BaseFragment() {
                 rcvAll?.addItemDecoration(ItemDecoration())
             }
             rcvAll?.layoutManager = NewsAllAdapter.WrapContentLinearLayoutManager(context!!)
-            rcvAll?.setItemViewCacheSize(10)
+//            rcvAll?.setItemViewCacheSize(10)
+            rcvAll?.clearOnScrollListeners()
             rcvAll?.adapter = adapter
             val itemTouchHelperCallback = adapter.RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
             if (itemTouchHelperCallback != null) {

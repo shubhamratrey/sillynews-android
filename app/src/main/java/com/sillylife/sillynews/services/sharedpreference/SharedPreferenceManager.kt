@@ -1,6 +1,9 @@
 package com.sillylife.sillynews.services.sharedpreference
 
 import android.text.TextUtils
+import com.google.gson.Gson
+import com.sillylife.sillynews.models.UserProfile
+import com.sillylife.sillynews.utils.CommonUtil
 
 
 object SharedPreferenceManager {
@@ -11,6 +14,7 @@ object SharedPreferenceManager {
 
     private const val FIREBASE_AUTH_TOKEN = "firebase_auth_token"
     private const val FCM_REGISTERED_USER = "fcm_registered_user"
+    private const val USER = "user"
 
 
     fun storeFirebaseAuthToken(firebaseAuthToken: String) {
@@ -31,6 +35,19 @@ object SharedPreferenceManager {
     fun setFCMRegisteredOnserver(userId: String) {
         sharedPreferences.setBoolean(FCM_REGISTERED_USER + userId, true)
     }
+
+    fun setUser(user: UserProfile) {
+        sharedPreferences.setString(USER, Gson().toJson(user))
+    }
+
+    fun getUser(): UserProfile? {
+        val raw: String = sharedPreferences.getString(USER, "")!!
+        if (!CommonUtil.textIsEmpty(raw)) {
+            return Gson().fromJson(raw, UserProfile::class.java)
+        }
+        return null
+    }
+
 
 
 }

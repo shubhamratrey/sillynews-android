@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.LayoutInflater
 import android.view.View
@@ -73,6 +74,15 @@ class TaskAllAdapter(
             }
         }
     }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override fun setHasStableIds(hasStableIds: Boolean) {
+        super.setHasStableIds(hasStableIds)
+    }
+
 
     override fun getItemViewType(position: Int): Int {
         return when {
@@ -243,6 +253,10 @@ class TaskAllAdapter(
                 }
             })
         }
+
+        holder.addSchedule.setOnClickListener {
+            listener(holder.adapterPosition, holder.adapterPosition, Constants.ADD_SCHEDULE)
+        }
     }
 
     fun addMoreScheduleData(response: HomeDataResponse) {
@@ -260,8 +274,8 @@ class TaskAllAdapter(
         commonItemLists.remove(PROGRESS_VIEW)
         if (homeDataResponse.dataItems != null && homeDataResponse.dataItems!!.isNotEmpty()) {
             pageNo++
-            this.response.dataItems!!.addAll(homeDataResponse.dataItems!!)
-            this.response.hasMore = homeDataResponse.hasMore
+//            this.response.dataItems!!.addAll(homeDataResponse.dataItems!!)
+//            this.response.hasMore = homeDataResponse.hasMore
             homeDataResponse.dataItems!!.forEach {
                 when {
                     it.type == USER_INFO -> commonItemLists.add(it.userInfo!!)
@@ -365,4 +379,9 @@ class TaskAllAdapter(
             }
         }
     }
+
+    fun addSchedules(){
+
+    }
+
 }

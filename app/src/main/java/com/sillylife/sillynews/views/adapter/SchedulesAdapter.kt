@@ -3,6 +3,7 @@ package com.sillylife.sillynews.views.adapter
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,7 +58,7 @@ class SchedulesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = when (viewType) {
             SCHEDULE -> LayoutInflater.from(context).inflate(R.layout.item_schedule, parent, false)
-            else -> LayoutInflater.from(context).inflate(R.layout.item_progress, parent, false)
+            else -> LayoutInflater.from(context).inflate(R.layout.item_schedule_progress, parent, false)
         }
         return Holder(view)
     }
@@ -116,8 +117,8 @@ class SchedulesAdapter(
     }
 
     fun addMoreData(response: HomeDataItem) {
-        val oldSize = itemCount
         commonItemLists.remove(PROGRESS_VIEW)
+        val oldSize = itemCount
         if (response.schedules != null && response.schedules!!.isNotEmpty()) {
             pageNo++
             this.response.schedules!!.addAll(response.schedules!!)

@@ -11,6 +11,7 @@ object FragmentHelper {
 
     const val HOME = "home"
     const val HOME_TO_WEBVIEW= "home_to_webview"
+    const val HOME_TO_ADD_SCHEDULE= "home_to_add_schedule"
 
     fun replace(@IdRes containerId: Int, fragmentManager: FragmentManager, fragment: Fragment, tag: String) {
         val fragmentTransaction = fragmentManager.beginTransaction()
